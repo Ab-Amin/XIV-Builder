@@ -1,0 +1,65 @@
+.nav{
+  width: 100wh;
+  background-color: lightcyan;
+
+  nav{
+    background-color: lightcyan;
+    width: 70%;
+    padding: 4px 0;
+    margin: 0 auto;
+  
+    ul{
+      background-color: lightcyan;
+
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+  
+      li{
+        margin: 0 3px;
+        white-space: nowrap;
+        i{
+          vertical-align: baseline;
+          font-size: 11px;
+        }
+      }
+  
+      .drop-down{
+        display: none;
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
