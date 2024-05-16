@@ -112,11 +112,11 @@ let gearWindowX = document.querySelector('.search-window--x')
 
 function openGearWindow() {
   gearWindow.classList.add('gear-window-pop')
-  console.log('opening popup');
+  // console.log('opening popup');
 }
 function closeGearWindow() {
   gearWindow.classList.remove('gear-window-pop')
-  console.log('closing popup');
+  // console.log('closing popup');
 }
 
 gearGrid.addEventListener('click', e => {
