@@ -3,14 +3,19 @@
 //   color-scheme: light dark;
 // }
 
+html, body{
+  overflow-x: hidden;
+}
+
 *{
   font-family: Arial, Verdana, sans-serif,;
 }
 
 .wrapper{
-  // pc ver
+  // =-=> pc ver
   // max-width: 1200px;
   min-width: 300px;
+  max-width: 375px;
   margin: 0 auto;
 }
 
@@ -26,28 +31,19 @@ a{
 }
 
 
+// click on gear selector
+.gear-box{
+  transition: all .15s ease-in-out;
+  &:active{
+    transition: all .15s ease-in-out;
+    scale: 0.95;
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // =-=> pc ver
+  // &:hover{
+  //   transition: all .15 ease-in-out;
+  //   scale: 1.05;
+  // }
+}
 
 
