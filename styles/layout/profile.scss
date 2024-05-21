@@ -2,6 +2,7 @@
   background-color: lightpink;
   padding: 5px;
   
+  position: relative;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -62,6 +63,7 @@
       height: 55px;
     }
   }
+
 }
 
 

@@ -1,0 +1,168 @@
+{
+  "jobInfo": [
+    {
+      "tanks" : [
+        {
+          "shortname" : "PLD",
+          "fullname" : "Paladin",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/V/NUXU4h6iXzF8HS4BxHKYf7vOa0.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "WAR",
+          "fullname" : "Warrior",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/0/U3f8Q98TbAeGvg_vXiHGOaa2d4.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "DRK",
+          "fullname" : "Dark Knight",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/9/5JT3hJnBNPZSLAijAF9u7zrueQ.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "GNB",
+          "fullname" : "Gunbreaker",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/8/fc5PYpEFGrg4qPYDq_YBbCy1X0.png",
+          "jobstone" : ""
+        }
+      ]
+    },
+    {
+      "healers" : [
+        {
+          "shortname" : "WHM",
+          "fullname" : "White Mage",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/G/Na619RGtVtbEvNn1vyFoSlvZ84.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "SCH",
+          "fullname" : "Scholar",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/s/2r8fm3U0Io7Pw1XT1tvnjPthp4.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "AST",
+          "fullname" : "Astrologian",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/E/g7JY4S1D-9S26VarEuIkPGIrFM.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "SGE",
+          "fullname" : "Sage",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/e/G0lQTD01LdCGk5pECSc7fbbmbM.png",
+          "jobstone" : ""
+        }
+      ]
+    },
+    {
+      "meles" : [
+        {
+          "shortname" : "MNK",
+          "fullname" : "Monk",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/C/Ce_VQB6VPPJKTGJwxf3h5iujp4.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "DRG",
+          "fullname" : "Dragoon",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/1/zWRkXGJIJhN7WHGGv1gVscRxmA.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "NIN",
+          "fullname" : "Ninja",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/N/EXvdQYvr1Rn4En8AKssbVwwcac.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "SAM",
+          "fullname" : "Samurai",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/J/Ra2GV79gVQhy6SwCrU19boTghc.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "RPR",
+          "fullname" : "Reaper",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/p/y8GHAXX4qhY7D-yqnCqtEPkjoo.png",
+          "jobstone" : ""
+        }
+      ]
+    },
+    {
+      "phys" : [
+        {
+          "shortname" : "BRD",
+          "fullname" : "Bard",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/b/d7BM1x8OZRZU-9fTk-D7g1t2oc.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "MCH",
+          "fullname" : "Machinist",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/2/oHLJxTt_OLDK_eQkRTBVNwwxeE.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "DNC",
+          "fullname" : "Dancer",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/0/ZzzbixB1HHW9FaxNXdfY7Y7lvw.png",
+          "jobstone" : ""
+        }
+      ]
+    },
+    {
+      "mages" : [
+        {
+          "shortname" : "BLM",
+          "fullname" : "Black Mage",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/A/7JuT00VSwaFqTfcTYUCUnGPFQE.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "SMN",
+          "fullname" : "Summoner",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/b/ZwJFxv3XnfqB5N6tKbgXKnj6BU.png",
+          "jobstone" : ""
+        },
+        {
+          "shortname" : "RDM",
+          "fullname" : "Red Mage",
+          "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/C/NRnqJxzRtbDKR1ZHzxazWBBR2Y.png",
+          "jobstone" : ""
+        }
+      ]
+    }
+  ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
