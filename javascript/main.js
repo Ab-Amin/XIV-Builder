@@ -29,7 +29,7 @@
 // https://docs.google.com/spreadsheets/d/1KtWCELA7ggvYXYumxIib-n3ZbD1UKlnaXyQiy-6LiTI/edit?usp=sharing
 
 
-// =-=-=-=-=| Variables |=-=-=-=-=
+//! =-=-=-=-=| Variables |=-=-=-=-=
 
 // data numbers to name
 const itemId = 0;
@@ -50,11 +50,11 @@ const meleDiv = document.querySelector('.meles');
 const phyDiv = document.querySelector('.phys');
 const mageDiv = document.querySelector('.mages');
 
-// =-=-=-=-=| lists |=-=-=-=-=
+//! =-=-=-=-=| lists |=-=-=-=-=
 let itemData = [];
 
 
-// =-=-=-=-=| CSV fetch |=-=-=-=-=
+//! =-=-=-=-=| CSV fetch |=-=-=-=-=
 fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item.csv')
   .then(response => response.text())
   .then(csvData => {
@@ -97,7 +97,7 @@ fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item
     // }
     // console.log(itemData);
 
-    // =-=-=| search bar |=-=-=
+    //! =-=-=| search bar |=-=-=
     // todo : log every item name to put them in a "search bar"
     // todo : sort by equip slot category (if excel[18] == 1/2/3/4/... { => main/off hand,head,body,... })
     // for (let i = 0; i < array.length; i++) {
@@ -106,7 +106,7 @@ fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item
 
 
 
-    // =-=-=| search results |=-=-=
+    //! =-=-=| search results |=-=-=
     // for (let i = 0; i < data.length; i++) {
     
     // condition #1 : get job taken and add it as a conition for gears to appear
@@ -155,10 +155,7 @@ fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item
 .catch(err => console.error('Error fetching CSV:', err));
 
 
-// =-=-=-=-=| my .json file |=-=-=-=-=
-
-// fill job-selector window without having to write everything 
-
+//! =-=-=-=-=| my .json file |=-=-=-=-=
 fetch("info.json")
 	.then(response => response.json())
 	.then(data => {
@@ -245,7 +242,7 @@ fetch("info.json")
 
 
 
-// =-=-=-=-=| Gear window popup |=-=-=-=-=
+//! =-=-=-=-=| Gear window popup |=-=-=-=-=
 let profile = document.querySelector('.profile');
 
 let gearGrid = document.querySelector('.gear-grid')
