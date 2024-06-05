@@ -231,21 +231,28 @@ fetch("info.json")
     //? GPT : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
     //? --> flatMap(...)
 
+    //! get job icon based on csv number
     function findJobByCSVcode(code) {
       // Flatten the arrays inside jobInfo
       const allJobs = data.jobInfo.flatMap(category => {
         // Flatten each category's job array
         return Object.values(category).flat();
-      });
-      console.log(allJobs);
-    
+      })
+
       // Find the job with the matching CSVcode
       const job = allJobs.find(job => job.CSVcode === code);
 
-      console.log(job);
-
-      // Return the job name if found, otherwise return a not found message
-      return (job ? job.jobicon : 'Job not found')
+      // Return an object with both names if found, otherwise return a not found message
+      // return (job ? job.jobicon : 'Job not found')
+      if (job) {
+        return {
+          jobstone: job.jobstone,
+          jobicon: job.jobicon,
+          shortname: job.shortname
+        };
+      } else {
+        return 'Job not found';
+      }
     }
 
 
@@ -256,19 +263,26 @@ fetch("info.json")
         let datajob = e.target.closest('.job').getAttribute('data-job')
         // console.log(typeOf(datajob));
 
-        const jobIcon = findJobByCSVcode(Number(datajob));
+        const jobInfo = findJobByCSVcode(Number(datajob));
         // console.log(jobIcon);
 
-        document.querySelector('.profile-job').innerHTML=`
+        document.querySelector('.profile-job').innerHTML= `
         <div
           class="job-change gear-box" 
-          style="background: url('${jobIcon}') center/cover" 
+          style="background: url('${jobInfo.jobicon}') center/cover" 
           data-job="${datajob}"
           data-effect="gear-box--anim" 
           >
         </div>
         `
+        
+        document.querySelector('.job-stone').innerHTML= `
+          <img src="${jobInfo.jobstone}" alt="">
+          <span>${jobInfo.shortname}</span>
+        `
+      
       }
+
     })
 
   })
