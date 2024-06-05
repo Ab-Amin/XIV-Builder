@@ -11,6 +11,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 
+  <!-- JS -->
+  <script src="https://kit.fontawesome.com/99fa1db12f.js" crossorigin="anonymous" defer></script>
+  <script type="module" src="javascript/main.js" defer></script>
+  <script type="module" src="javascript/numberToName.js" defer></script>
+  
+
   <title> XIVBuilder - wip </title>
 </head>
 <body>
@@ -35,34 +41,41 @@
     </div>
   </header>  
 
-  <section class="nav wrapper">
+  <!-- <section class="nav wrapper">
     <nav class="wrapper">
       <ul>
         <li><a href="#">option 1</a></li> <span>|</span>
         <li><a href="#">option 2</a></li> <span>|</span>
         <li><a href="#">option 3</a></li> <span>|</span>
         <li>option 4 <i class="fa-solid fa-angle-down"></i>
-          <!-- faire un menu déroulant pour dérniere option -->
           <ul class="drop-down">
             <li>option 4-1</li>
             <li>option 4-2</li>
             <li>option 4-3</li>
           </ul>
         </li>
-      </ul>
-      <!-- JS | class 'pc' makes it hidden in mobile size -->
-      <div class="pc pc-search-bar"></div>
     </nav>
-  </section>
+  </section> -->
 
   <main class="wrapper">
 
     <div class="profile">
       <!-- left info -->
       <div>
-        <div class="face" style="background-color: #4f4f4f81; border-radius: 50%;">
-          <!-- <img src="img/close-up.jpg" alt=""> -->
+        <!-- right info -->
+        <div class="profile-job">
+          <div
+            class="job-change gear-box" 
+            style="background: url('https://lds-img.finalfantasyxiv.com/promo/h/1/zWRkXGJIJhN7WHGGv1gVscRxmA.png') center/cover" 
+            data-effect="gear-box--anim" 
+            >
+          </div>
         </div>
+
+        <!-- <div class="face" style="background-color: #4f4f4f81; border-radius: 50%;">
+          <img src="img/close-up.jpg" alt="">
+        </div> -->
+
         <div class="info">
           <div class="title">your title</div>
           <div class="name">ReallyReallyLong Name</div>
@@ -70,26 +83,22 @@
         </div>
       </div>
       
-      <!-- right info -->
-      <div>
-        <div class="job-stone gear-box" style="background: url('https://lds-img.finalfantasyxiv.com/promo/h/1/zWRkXGJIJhN7WHGGv1gVscRxmA.png') center/cover;" data-effect="gear-box--anim"></div>
-      </div>
 
 
       
     </div>
+    
 
-    <section>
-      
+    <section class="main">
 
       <div class="bg-img">
 
         <div class="job-save">
           <!-- todo : click here ot change job, give warning if didn't save, will lose previous 'build' -->
           <!-- todo : 'animation' on job selection window https://www.instagram.com/reel/C4pfZqlAE_T/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA== -->
-          <div class="job-stone">
+          <div class="job-stone" >
             <img src="https://lds-img.finalfantasyxiv.com/itemicon/90/90a074bc23335b75f1830e38bf1d95a8c8a3e54d.png?n6.58" alt="">
-            <span>name</span>
+            <span> drg</span>
           </div>
           <!-- <div class="save">
             <button><i class="fa-regular fa-floppy-disk"></i></button>
@@ -98,9 +107,7 @@
 
         <div class="gear-grid">
           <div class="left-gear">
-            <a href="#search-window">
-              <div class="gear-box" style="background: url('img/mainhand-gear.png') center/cover no-repeat"></div>
-            </a>
+            <div class="gear-box" data-geartype="" style="background: url('https://lds-img.finalfantasyxiv.com/h/7/mtNnou0UTXvUNJowSYdy_od2M0.png') center/cover no-repeat"></div>
             <div class="gear-box" data-geartype="" style="background: url('https://lds-img.finalfantasyxiv.com/h/n/yFYzr3MsoOwa903TORtTkCNbgo.png') center/cover no-repeat"></div>
             <div class="gear-box" data-geartype="" style="background: url('https://lds-img.finalfantasyxiv.com/h/K/3ZGSMqkE3dp22nLQ7VDviN593A.png') center/cover no-repeat"></div>
             <div class="gear-box" data-geartype="" style="background: url('https://lds-img.finalfantasyxiv.com/h/j/j01DcG9E75A4v22IObCufIAjTo.png') center/cover no-repeat"></div>
@@ -122,6 +129,7 @@
             <div><img class="search-window--x" src="img/xbutton.png" alt=""></div>
 
             <div class="search">
+              <!-- todo : if scrolling to the point of not seeing search bar => arrow back to top apprears-->
               <div>
                 <input type="search">
                 <button type="button"><i class="fa-solid fa-magnifying-glass"></i></button>
@@ -168,66 +176,6 @@
                   </div>
                 </div>
 
-                <div class="item">
-                  <div>
-                    <img src="https://lds-img.finalfantasyxiv.com/itemicon/66/665f0061dcd3853e6d3ccf315b7629ac8d0fdf32.png?n6.58" alt="">
-                  </div>
-                  <div>
-                    <span>Augmented Shire Longbow</span>
-                    <span>lvl 60, Ilvl 270</span>
-                    <div class="bonuses">
-                      <span>ACR, BRD</span>
-                      <hr>
-                      <div class="stats">
-                        <p><span>dexterity</span> +98</p>
-                        <p><span>critical hit</span> +96</p>
-                        <p><span>vitality</span> +103</p>
-                        <p><span>determination</span> +67</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="item">
-                  <div>
-                    <img src="https://lds-img.finalfantasyxiv.com/itemicon/66/665f0061dcd3853e6d3ccf315b7629ac8d0fdf32.png?n6.58" alt="">
-                  </div>
-                  <div>
-                    <span>Augmented Shire Longbow</span>
-                    <span>lvl 60, Ilvl 270</span>
-                    <div class="bonuses">
-                      <span>ACR, BRD</span>
-                      <hr>
-                      <div class="stats">
-                        <p><span>dexterity</span> +98</p>
-                        <p><span>critical hit</span> +96</p>
-                        <p><span>vitality</span> +103</p>
-                        <p><span>determination</span> +67</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="item">
-                  <div>
-                    <img src="https://lds-img.finalfantasyxiv.com/itemicon/66/665f0061dcd3853e6d3ccf315b7629ac8d0fdf32.png?n6.58" alt="">
-                  </div>
-                  <div>
-                    <span>Augmented Shire Longbow</span>
-                    <span>lvl 60, Ilvl 270</span>
-                    <div class="bonuses">
-                      <span>ACR, BRD</span>
-                      <hr>
-                      <div class="stats">
-                        <p><span>dexterity</span> +98</p>
-                        <p><span>critical hit</span> +96</p>
-                        <p><span>vitality</span> +103</p>
-                        <p><span>determination</span> +67</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
               </div>
             </div>
             
@@ -239,9 +187,95 @@
       </div>
     </section>
 
-    <aside>
+    <section class="stats-window">
 
-    </aside>
+      <div>
+        <div class="HP">
+          <div>
+            <div>HP</div>
+            <div>99999</div>
+          </div>
+          <div class="bar"></div>
+        </div>
+
+        <div class="MP">
+          <div>
+            <div>MP</div>
+            <div>10000</div>
+          </div>
+          <div class="bar"></div>
+        </div>
+      </div>
+
+      <div>
+
+        <div>
+          <div class="attributes">
+            <div>Attributes</div>
+            <ul>
+              <li>Strengh<span>0</span></li>
+              <li>dexterity<span>0</span></li>
+              <li>vitality<span>0</span></li>
+              <li>intelligence<span>0</span></li>
+              <li>mind<span>0</span></li>
+            </ul>
+          </div>
+          <div class="role">
+            <div>role</div>
+            <ul>
+              <li>tenacity<span>0</span></li>
+              <li>piety<span>0</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="offensive">
+            <div>offensive</div>
+            <ul>
+              <li>critical hit<span>0</span></li>
+              <li>determination<span>0</span></li>
+              <li>direct hit rate<span>0</span></li>
+            </ul>
+          </div>
+          <div class="defensive">
+            <div>defense</div>
+            <ul>
+              <li>defence<span>0</span></li>
+              <li>magic defense<span>0</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="physial">
+            <div>physial</div>
+            <ul>
+              <li>attack power<span>0</span></li>
+              <li>skill speed<span>0</span></li>
+            </ul>
+          </div>
+          <div class="mental">
+            <div>mental</div>
+            <ul>
+              <li>attack magic<span>0</span></li>
+              <li>healing magic<span>0</span></li>
+              <li>spell speed<span>0</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <div class="gear-level">
+            <div>gear-level</div>
+            <ul>
+              <li>average item level<span>0</span></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </section>
 
   </main>
 
@@ -250,38 +284,24 @@
 
       <div class="job-selector">
         <span class="job-selector--x"><img class="search-window--x" src="img/xbutton.png" alt=""></span>
-  
         <div class="job-tank-healers">
-  
           <div class="tanks">
-  
             <!-- <div class="job pld">
               <div class="job-icon">
                 <img src="https://lds-img.finalfantasyxiv.com/promo/h/1/zWRkXGJIJhN7WHGGv1gVscRxmA.png" alt="">
               </div>
               <div class="job-name">drg</div>
             </div> -->
-  
           </div>
-  
           <div class="healers"></div>
-  
         </div>
-  
         <div class="job-damage-dealers">
-  
           <div class="meles"></div>
-  
           <div class="ranged">
-  
             <div class="phys"></div>
-  
             <div class="mages"></div>
-            
           </div>
-  
         </div>
-        
       </div>
   
     </div>
@@ -290,7 +310,5 @@
 
   </footer>
 
-  <script src="https://kit.fontawesome.com/99fa1db12f.js" crossorigin="anonymous"></script>
-  <script src="javascript/main.js"></script>
 </body>
 </html>

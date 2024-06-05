@@ -30,25 +30,29 @@
 
 
 //! =-=-=-=-=| Variables |=-=-=-=-=
-
-// data numbers to name
-const itemId = 0;
-const SingItemName = 10;
-const itemLevel = 12;
-const levelReq = 41;
-// todo : translate icon codes into images with xiv icon api
-const icon = 11;
-// todo : gear category => translate num into gear type category + num into class names 
-
+import * as gearName from './numberToName.js'
 
 // html variables
 const searchResults = document.querySelector('.search-results');
 
+//* div in the job selector window
 const tankDiv = document.querySelector('.tanks');
 const healerDiv = document.querySelector('.healers');
 const meleDiv = document.querySelector('.meles');
 const phyDiv = document.querySelector('.phys');
 const mageDiv = document.querySelector('.mages');
+
+const mainJobLogo = document.querySelector('.job-change')
+
+const profile = document.querySelector('.profile');
+
+const gearGrid = document.querySelector('.gear-grid')
+let gearWindow = document.querySelector('.search-window')
+const gearWindowX = document.querySelector('.search-window--x')
+
+const jobSelector = document.querySelector('.job-selector') 
+const jobSelectorBG = document.querySelector('.dark-bg')
+const jobSelectorX = document.querySelector('.job-selector--x')
 
 //! =-=-=-=-=| lists |=-=-=-=-=
 let itemData = [];
@@ -62,8 +66,7 @@ fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item
     const rows = csvData.split('\n');
     const data = rows.map(row => row.split(','));
 
-    // Print the parsed data to the console
-    console.log(data);
+    // console.log(data);
 
     // todo : link itemName with a search bar (addEventListener)
 
@@ -71,31 +74,34 @@ fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item
     // example : Allegiance set (head, body, hand, etc) => gear exclusif to gnb, 
     // if i only write 'allegiance', should display every gear that contains the  word 'allegiance' 
 
-    // const itemName = `"wind shard"`;
+    const itemName = `"Augmented Shire Longbow"`;
 
-    // for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
 
-    //   // data[i][1] : to skip any undefined or null values
-    //   // .toLowerCase() to make comparisons case-insensitive
-    //   // .includes to check if one string is contained within another
-    //   if (data[i][10] && data[i][10].toLowerCase().includes(itemName.toLowerCase())) {
-    //     itemData.push({ 
-    //       dataInfo : {
-    //         itemId : data[i][0],
-    //         row: i, 
-    //         column: 0,
-    //       },
-    //       "singularName" : data[i][SingItemName],
-    //       // "iconcode" : data[i][icon],
-    //       // "levelReq" : data[i][levelReq],
-    //       // "itemLevel" : data[i][itemLevel],
-    //       "className" : data[i][44],
-    //       "gearType" : data[i][18],
-    //     });
-    //     console.log(data[i]);
-    //   }
-    // }
-    // console.log(itemData);
+      // data[i][1] : to skip any undefined or null values
+      // .toLowerCase() to make comparisons case-insensitive
+      // .includes to check if one string is contained within another
+      if (data[i][10] && data[i][10].toLowerCase().includes(itemName.toLowerCase())) {
+        itemData.push({ 
+          dataInfo : {
+            itemId : data[i][0],
+            row: i, 
+            column: 0,
+          },
+          "singularName" : data[i][gearName.SingItemName],
+          // "iconcode" : data[i][icon],
+          // "levelReq" : data[i][levelReq],
+          // "itemLevel" : data[i][itemLevel],
+          "className" : data[i][44],
+          "gearType" : data[i][18],
+        });
+        // console.log(data[i]);
+      }
+    }
+    console.log(itemData);
+
+
+
 
     //! =-=-=| search bar |=-=-=
     // todo : log every item name to put them in a "search bar"
@@ -143,29 +149,20 @@ fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item
     // }
 
 
-
-
-
-    // forgot what i wanted to do ._. ...
-    // let rowNum = itemData.findIndex(item => item.singularName === itemName);
-    // console.log(itemData[rowNum].dataPosition.row);
-    // console.log(rowNum);
-
-  })
-.catch(err => console.error('Error fetching CSV:', err));
+}).catch(err => console.error('Error fetching CSV:', err));
 
 
 //! =-=-=-=-=| my .json file |=-=-=-=-=
 fetch("info.json")
 	.then(response => response.json())
 	.then(data => {
-    console.log(console.log(data));
+    console.log(data);
 
-    // dans div 'tank'
+    //* dans div 'tank'
     for (let i = 0; i < data.jobInfo[0].tanks.length; i++) {
       
       tankDiv.innerHTML += `
-      <div class="job ${data.jobInfo[0].tanks[i].shortname}">
+      <div class="job ${data.jobInfo[0].tanks[i].shortname}" data-job="${data.jobInfo[0].tanks[i].CSVcode}">
         <div class="job-icon">
           <img src="${data.jobInfo[0].tanks[i].jobicon}" alt="">
         </div>
@@ -174,11 +171,11 @@ fetch("info.json")
       `
     }
 
-    // dans div "healer"
+    //* dans div "healer"
     for (let i = 0; i < data.jobInfo[1].healers.length; i++) {
       
       healerDiv.innerHTML += `
-      <div class="job ${data.jobInfo[1].healers[i].shortname}">
+      <div class="job ${data.jobInfo[1].healers[i].shortname}" data-job="${data.jobInfo[1].healers[i].CSVcode}">
         <div class="job-icon">
           <img src="${data.jobInfo[1].healers[i].jobicon}" alt="">
         </div>
@@ -187,11 +184,11 @@ fetch("info.json")
       `
     }
 
-    // dans div "mele"
+    //* dans div "mele"
     for (let i = 0; i < data.jobInfo[2].meles.length; i++) {
       
       meleDiv.innerHTML += `
-      <div class="job ${data.jobInfo[2].meles[i].shortname}">
+      <div class="job ${data.jobInfo[2].meles[i].shortname}" data-job="${data.jobInfo[2].meles[i].CSVcode}">
         <div class="job-icon">
           <img src="${data.jobInfo[2].meles[i].jobicon}" alt="">
         </div>
@@ -200,11 +197,11 @@ fetch("info.json")
       `
     }
 
-    // dans div "ranged"
+    //* dans div "ranged"
     for (let i = 0; i < data.jobInfo[3].phys.length; i++) {
       
       phyDiv.innerHTML += `
-      <div class="job ${data.jobInfo[3].phys[i].shortname}">
+      <div class="job ${data.jobInfo[3].phys[i].shortname}" data-job="${data.jobInfo[3].phys[i].CSVcode}">
         <div class="job-icon">
           <img src="${data.jobInfo[3].phys[i].jobicon}" alt="">
         </div>
@@ -217,7 +214,7 @@ fetch("info.json")
     for (let i = 0; i < data.jobInfo[4].mages.length; i++) {
       
       mageDiv.innerHTML += `
-      <div class="job ${data.jobInfo[4].mages[i].shortname}">
+      <div class="job ${data.jobInfo[4].mages[i].shortname}" data-job="${data.jobInfo[4].mages[i].CSVcode}">
         <div class="job-icon">
           <img src="${data.jobInfo[4].mages[i].jobicon}" alt="">
         </div>
@@ -227,12 +224,52 @@ fetch("info.json")
     }
 
 
+    
+    //! =-=-=-=-=| Job Selector |=-=-=-=-=-=
+    // todo : take job selected into profile 
 
-    // todo : 
-    // - if e.target click on div containing class 'job'
-    // - takes full name of 
+    //? GPT : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
+    //? --> flatMap(...)
+
+    function findJobByCSVcode(code) {
+      // Flatten the arrays inside jobInfo
+      const allJobs = data.jobInfo.flatMap(category => {
+        // Flatten each category's job array
+        return Object.values(category).flat();
+      });
+      console.log(allJobs);
+    
+      // Find the job with the matching CSVcode
+      const job = allJobs.find(job => job.CSVcode === code);
+
+      console.log(job);
+
+      // Return the job name if found, otherwise return a not found message
+      return (job ? job.jobicon : 'Job not found')
+    }
 
 
+    jobSelector.addEventListener('click', e => {
+
+      if (e.target.closest('.job').hasAttribute('data-job')){
+    
+        let datajob = e.target.closest('.job').getAttribute('data-job')
+        // console.log(typeOf(datajob));
+
+        const jobIcon = findJobByCSVcode(Number(datajob));
+        // console.log(jobIcon);
+
+        document.querySelector('.profile-job').innerHTML=`
+        <div
+          class="job-change gear-box" 
+          style="background: url('${jobIcon}') center/cover" 
+          data-job="${datajob}"
+          data-effect="gear-box--anim" 
+          >
+        </div>
+        `
+      }
+    })
 
   })
   .catch(error => {console.log("Erreur lors de la récup des données :", error);
@@ -241,18 +278,7 @@ fetch("info.json")
 
 
 
-
 //! =-=-=-=-=| Gear window popup |=-=-=-=-=
-let profile = document.querySelector('.profile');
-
-let gearGrid = document.querySelector('.gear-grid')
-let gearWindow = document.querySelector('.search-window')
-let gearWindowX = document.querySelector('.search-window--x')
-
-let jobSelector = document.querySelector('.job-selector') 
-let jobSelectorBG = document.querySelector('.dark-bg')
-let jobSelectorX = document.querySelector('.job-selector--x')
-
 
 function openGearWindow() {
   gearWindow.classList.remove('gear-window-pop-reverse');
@@ -271,12 +297,14 @@ function closeJobSelector() {
 }
 
 
-// closing popup when clicking outside of it
+//* closing popup when clicking outside of it
 function outsideClickClose(windowName, closingWingowButton) {
   document.addEventListener('click', function(e) {
-    // if target is not in the popupwindow and click is not the closing button of popup
+
+    //* if target is not in the popupwindow and click is not the closing button of popup
     if (!windowName.contains(e.target) && e.target !== closingWingowButton) {
-      // kept closing even when not opened, so added condition to only close when it has the class that make it open 
+
+      //* kept closing even when not opened, so added condition to only close when it has the class that make it open 
       if (windowName.classList.contains('gear-window-pop')){
         closeGearWindow()
       }
@@ -288,7 +316,8 @@ function outsideClickClose(windowName, closingWingowButton) {
 
 gearGrid.addEventListener('click', e => {
   if (e.target.classList.contains('gear-box')) {
-    // Stop event propagation to prevent the document click listener from being immediately triggered
+
+    //* Stop event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();
     openGearWindow()
   }
@@ -301,13 +330,11 @@ gearWindowX.addEventListener('click', closeGearWindow)
 profile.addEventListener('click', e => {
   // todo : if clicked on a 'job' => takes name of job and then closes
 
-  if (e.target.classList.contains('job-stone')) {
-    console.log('click');
+  if (e.target.classList.contains('job-change')) {
     e.stopPropagation();
     openJobSelector()
   }
 })
 outsideClickClose(jobSelectorBG, jobSelectorX)
+
 jobSelectorX.addEventListener('click', closeJobSelector)
-
-

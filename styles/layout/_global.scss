@@ -4,6 +4,10 @@
 // }
 
 html, body{
+  @media screen and (min-width:800px) {
+    min-width: 800px;
+
+  }
   overflow-x: hidden;
   position: relative;
 }
@@ -13,6 +17,12 @@ html, body{
 }
 
 .wrapper{
+  @media screen and (min-width:800px) {
+    min-width: 800px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: fit-content;
+  }
   // =-=> pc ver
   // max-width: 1200px;
   min-width: 300px;
@@ -96,7 +106,7 @@ a{
     padding: 10px;
 
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
 
@@ -157,21 +167,22 @@ a{
         }
       }
 
-
-      .tanks .job{
+      .job{
         border-radius: 10px;
         transition: all .15s ease-in-out;
         &:hover{
-          background-color: rgba(59, 59, 255, 0.770);
           transition: all .15s ease-in-out;
         }
       }
+
+      .tanks .job{
+        &:hover{
+          background-color: rgba(59, 59, 255, 0.770);
+        }
+      }
       .healers .job{
-        border-radius: 10px;
-        transition: all .15s ease-in-out;
         &:hover{
           background-color: rgba(41, 140, 21, 0.770);
-          transition: all .15s ease-in-out;
         }
       }
 
@@ -182,12 +193,7 @@ a{
       }
       .job{
         &:hover{
-          border-radius: 10px;
-          transition: all .15s ease-in-out;
-          &:hover{
-            background-color: rgba(177, 39, 39, 0.770);
-            transition: all .15s ease-in-out;
-          }
+          background-color: rgba(177, 39, 39, 0.770);
         }
       }
     }
@@ -195,10 +201,11 @@ a{
   }
 
 }
+
 .hidden{
   opacity: 0;
   scale: 0;
-  transition: scale .01s ease-in-out;
+  transition: scale .1s ease-in-out;
   transition: opacity .2s ease-in-out;
 
   .job-selector{

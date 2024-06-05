@@ -1,12 +1,38 @@
 main{
   height: 100vh;
+
+  @media screen and (min-width:800px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 75px 1fr;
+    
+
+    .profile{
+      grid-column: 1 / span 3;
+      grid-row: 1 / span 1;
+      justify-self: start;
+      width: 100%;
+    }
+
+    section{
+      height: 80%;
+      max-width: 1300px;
+    }
+    .main{
+      width: 100%;
+    }
+    .stats-window{
+      width: 100%;
+    }
+  }
   
-  section{
-    background-color: lightsteelblue;
+  .main{
+    background-color: #242024;
     padding: 10px;
     padding-top: 2rem;
-    height: 80%;
-    max-width: 375px;
+    // height: 80%;
+    max-width: 100%;
+    overflow-y: hidden;
     margin: 0 auto;
     overflow-x: hidden;
 
@@ -18,7 +44,7 @@ main{
       
       background-color: rgba($color: #363636, $alpha: 0.4);
       // background: url('../img/xiv-character.jpg') center/cover;
-      height: 90%;
+      height: 580px;
       min-height: 355px;
 
       width: 100%;
@@ -40,10 +66,10 @@ main{
         justify-content: center;
         align-items: center;
   
-        border: 2px solid black;
-        border-radius: 10px;
-        background-color: rgba($color: rgba(0, 0, 0, 0), $alpha: 0.8);
-        padding: 3px 3px 4px;
+        // border: 2px solid black;
+        border-radius: 0 0 10px 10px;
+        background-color: #242024;
+        padding: 5px;
   
         .job-stone{
           display: flex;
@@ -103,7 +129,7 @@ main{
           width: 55px;
           height: 55px;
           
-          text-align: center;
+          justify-self: center;
         }
 
         // =-=-=-=| Gear Searching PopUp |=-=-=-=
