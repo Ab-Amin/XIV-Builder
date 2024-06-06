@@ -1,6 +1,4 @@
 main{
-  height: 100vh;
-
   @media screen and (min-width:800px) {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -20,10 +18,23 @@ main{
     }
     .main{
       width: 100%;
+      height: 100%;
     }
     .stats-window{
       width: 100%;
+      height: 100%;
     }
+  }
+
+  height: 100vh;
+  border: 2px groove rgb(188, 173, 74);
+  border-top: none;
+  border-radius: 0 0 15px 15px;
+  .main{
+    border-radius: 0 0 0 15px;
+  }
+  .stats-window{
+    border-radius: 0 0 15px 0;
   }
   
   .main{
@@ -82,7 +93,7 @@ main{
             border-radius: 8px;
             margin-right: 4px;
           }
-          span{
+          > span{
             display: flex;
             align-items: center;
             width: fit-content;
@@ -92,6 +103,11 @@ main{
             height: 25px;
             text-transform: uppercase;
             color: rgb(255, 221, 26);
+
+            span{
+              color: #eee;
+              font-size: 14px;
+            }
           }
         }
         .save{
@@ -288,12 +304,9 @@ main{
                     }
                   }
 
-
                 }
 
               }
-
-
 
             }
 

@@ -30,7 +30,7 @@
 
 
 //! =-=-=-=-=| Variables |=-=-=-=-=
-import * as gearName from './numberToName.js'
+import * as gearVar from './numberToName.js'
 
 // html variables
 const searchResults = document.querySelector('.search-results');
@@ -47,7 +47,7 @@ const mainJobLogo = document.querySelector('.job-change')
 const profile = document.querySelector('.profile');
 
 const gearGrid = document.querySelector('.gear-grid')
-let gearWindow = document.querySelector('.search-window')
+const gearWindow = document.querySelector('.search-window')
 const gearWindowX = document.querySelector('.search-window--x')
 
 const jobSelector = document.querySelector('.job-selector') 
@@ -56,243 +56,266 @@ const jobSelectorX = document.querySelector('.job-selector--x')
 
 //! =-=-=-=-=| lists |=-=-=-=-=
 let itemData = [];
+let choosenJob = [];
+
+//! =-=-=-=-=| my .json file |=-=-=-=-=
+
+fetch("info.json")
+.then(response => response.json())
+.then(data => {
+  // console.log(data);
+
+  //* dans div 'tank'
+  for (let i = 0; i < data.jobInfo[0].tanks.length; i++) {
+    
+    tankDiv.innerHTML += `
+    <div class="job ${data.jobInfo[0].tanks[i].shortname}" data-job="${data.jobInfo[0].tanks[i].CSVcode}">
+      <div class="job-icon">
+        <img src="${data.jobInfo[0].tanks[i].jobicon}" alt="">
+      </div>
+      <div class="job-name">${data.jobInfo[0].tanks[i].fullname}</div>
+    </div>
+    `
+  }
+
+  //* dans div "healer"
+  for (let i = 0; i < data.jobInfo[1].healers.length; i++) {
+    
+    healerDiv.innerHTML += `
+    <div class="job ${data.jobInfo[1].healers[i].shortname}" data-job="${data.jobInfo[1].healers[i].CSVcode}">
+      <div class="job-icon">
+        <img src="${data.jobInfo[1].healers[i].jobicon}" alt="">
+      </div>
+      <div class="job-name">${data.jobInfo[1].healers[i].fullname}</div>
+    </div>
+    `
+  }
+
+  //* dans div "mele"
+  for (let i = 0; i < data.jobInfo[2].meles.length; i++) {
+    
+    meleDiv.innerHTML += `
+    <div class="job ${data.jobInfo[2].meles[i].shortname}" data-job="${data.jobInfo[2].meles[i].CSVcode}">
+      <div class="job-icon">
+        <img src="${data.jobInfo[2].meles[i].jobicon}" alt="">
+      </div>
+      <div class="job-name">${data.jobInfo[2].meles[i].fullname}</div>
+    </div>
+    `
+  }
+
+  //* dans div "ranged"
+  for (let i = 0; i < data.jobInfo[3].phys.length; i++) {
+    
+    phyDiv.innerHTML += `
+    <div class="job ${data.jobInfo[3].phys[i].shortname}" data-job="${data.jobInfo[3].phys[i].CSVcode}">
+      <div class="job-icon">
+        <img src="${data.jobInfo[3].phys[i].jobicon}" alt="">
+      </div>
+      <div class="job-name">${data.jobInfo[3].phys[i].fullname}</div>
+    </div>
+    `
+  }
+
+  //* dans div "mage"
+  for (let i = 0; i < data.jobInfo[4].mages.length; i++) {
+    
+    mageDiv.innerHTML += `
+    <div class="job ${data.jobInfo[4].mages[i].shortname}" data-job="${data.jobInfo[4].mages[i].CSVcode}">
+      <div class="job-icon">
+        <img src="${data.jobInfo[4].mages[i].jobicon}" alt="">
+      </div>
+      <div class="job-name">${data.jobInfo[4].mages[i].fullname}</div>
+    </div>
+    `
+  }
+
+  //! =-=-=-=-=| Job Selector |=-=-=-=-=-=
+  // todo : take job selected into profile 
+  // todo : give warning if didn't save, will lose previous 'build'
+
+  //? GPT : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
+  //? --> flatMap(...)
+
+  //! Function that give info from my info.json based on CSVcode
+  function findJobByCSVcode(code) {
+    //* Flatten the arrays inside jobInfo
+    const allJobs = data.jobInfo.flatMap(category => {
+      //* Flatten each category's job array
+      return Object.values(category).flat();
+    })
+
+    //* Find the job with the matching CSVcode
+    const job = allJobs.find(job => job.CSVcode === code);
+
+    //* Return an object with both names if found, otherwise return a not found message
+    //* return (job ? job.jobicon : 'Job not found')
+    if (job) {
+      return {
+        jobstone: job.jobstone,
+        jobicon: job.jobicon,
+        shortname: job.shortname
+      };
+    } else {
+      return 'Job not found';
+    }
+  }
+
+  //* When selection job --> will change profile + stone and short job name
+  jobSelector.addEventListener('click', e => {
+
+    //*1st condition to avoid having an error when 'click' on empty zones (on popup)
+    if (e.target.closest('.job').hasAttribute('data-job')){
+      
+
+      var datajob = e.target.closest('.job').getAttribute('data-job')
+      const jobInfo = findJobByCSVcode(Number(datajob));
+
+      console.log(`You choose ${jobInfo.shortname} (${datajob})`);
+
+      if (Number(datajob)) {
+        choosenJob.push({
+          "choosenjob" : datajob,
+        });
+      }
+
+      // console.log(jobIcon);
+
+      document.querySelector('.profile-job').innerHTML= `
+      <div
+        class="job-change gear-box" 
+        style="background: url('${jobInfo.jobicon}') center/cover" 
+        data-job="${datajob}"
+        data-effect="gear-box--anim" 
+        >
+      </div>
+      `
+      document.querySelector('.job-stone').innerHTML= `
+        <img src="${jobInfo.jobstone}" alt="">
+        <span>${jobInfo.shortname}</span>
+      `
+    }
+
+  })
+
+})
+.catch(error => {console.log("Erreur lors de la récup des données :", error)})
 
 
 //! =-=-=-=-=| CSV fetch |=-=-=-=-=
+//todo : quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
+//todo : quand cloque off le search window, enlever toutes les classe draggeable
+
 fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item.csv')
-  .then(response => response.text())
-  .then(csvData => {
-    // Parse the CSV data into an array of arrays
-    const rows = csvData.split('\n');
-    const data = rows.map(row => row.split(','));
+.then(response => response.text())
+.then(csvData => {
+  // Parse the CSV data into an array of arrays
+  const rows = csvData.split('\n');
+  const data = rows.map(row => row.split(','));
 
-    // console.log(data);
+  // console.log(data);
 
-    // todo : link itemName with a search bar (addEventListener)
+  //! =-=-=| Display gear on search-window + Search Gear option
+  // todo : link itemName with a search bar (addEventListener)
+  // todo : add condition that if contains a part of the full gear name, will show every gear that contains that part of the word
+  // todo : log every item name to put them in a "search bar"
+  // todo : sort by equip slot category (if excel[18] == 1/2/3/4/... { => main/off hand,head,body,... })
+  // todo : if scrolling to the point of not seeing search bar => arrow 'back to top' apprears
 
-    // todo : add condition that if contains a part of the full name, will show every gear that contains that part of the word
-    // example : Allegiance set (head, body, hand, etc) => gear exclusif to gnb, 
-    // if i only write 'allegiance', should display every gear that contains the  word 'allegiance' 
-
-    const itemName = `"Augmented Shire Longbow"`;
-
-    for (let i = 0; i < data.length; i++) {
-
-      // data[i][1] : to skip any undefined or null values
-      // .toLowerCase() to make comparisons case-insensitive
-      // .includes to check if one string is contained within another
-      if (data[i][10] && data[i][10].toLowerCase().includes(itemName.toLowerCase())) {
-        itemData.push({ 
-          dataInfo : {
-            itemId : data[i][0],
-            row: i, 
-            column: 0,
-          },
-          "singularName" : data[i][gearName.SingItemName],
-          // "iconcode" : data[i][icon],
-          // "levelReq" : data[i][levelReq],
-          // "itemLevel" : data[i][itemLevel],
-          "className" : data[i][44],
-          "gearType" : data[i][18],
-        });
-        // console.log(data[i]);
-      }
-    }
-    console.log(itemData);
+  // example : Allegiance set (head, body, hand, etc) => gear exclusif to gnb, 
+  // if i only write 'allegiance', should display every gear that contains the  word 'allegiance' 
 
 
 
+  //! =-=-=| Gear Dispayed |=-=-=
+  //todo : condition #1 : get job taken and add it as a condition for gears to appear
+  //todo : condition #2 : get data-geartype and same
 
-    //! =-=-=| search bar |=-=-=
-    // todo : log every item name to put them in a "search bar"
-    // todo : sort by equip slot category (if excel[18] == 1/2/3/4/... { => main/off hand,head,body,... })
-    // for (let i = 0; i < array.length; i++) {
-      // console.log(data[i][SingItemName]);
-    // }
+  gearGrid.addEventListener('click', e => {
 
-
-
-    //! =-=-=| search results |=-=-=
-    // for (let i = 0; i < data.length; i++) {
-    
-    // condition #1 : get job taken and add it as a conition for gears to appear
-    // condition #2 : get data-geartype and same
-
-    //   // if the item has a name (not undefined or null) & is equipable (item need to be between lvl 1 and 90)
-    //   if (data[i][SingItemName]) {
-    //     if (1 < data[i][levelReq] < 90) {
-
-    //       searchResults.innerHTML += `
-    //       <div class="item">
-    //         <div>
-    //           <img src="https://lds-img.finalfantasyxiv.com/itemicon/66/665f0061dcd3853e6d3ccf315b7629ac8d0fdf32.png?n6.58" alt="">
-    //         </div>
-    //         <div>
-    //           <span>${data[i][SingItemName]}</span>
-    //           <span>lvl ${data[i][levelReq]}, Ilvl ${data[i][itemLevel]}</span>
-    //           <div class="bonuses">
-    //             <span>${data[i][44]}</span>
-    //             <hr>
-    //             <div class="stats">
-    //               <p><span>dexterity</span> +98</p>
-    //               <p><span>critical hit</span> +96</p>
-    //               <p><span>vitality</span> +103</p>
-    //               <p><span>determination</span> +67</p>
-    //             </div>
-    //           </div>
-    //         </div>
-    //       </div>
-    //       `
-
-    //     }
-    //   }
-    // }
-
-
-}).catch(err => console.error('Error fetching CSV:', err));
-
-
-//! =-=-=-=-=| my .json file |=-=-=-=-=
-fetch("info.json")
-	.then(response => response.json())
-	.then(data => {
-    console.log(data);
-
-    //* dans div 'tank'
-    for (let i = 0; i < data.jobInfo[0].tanks.length; i++) {
+    if (document.querySelector('.profile-job').firstElementChild.hasAttribute(`data-job`) && e.target.hasAttribute('data-geartype')) {
       
-      tankDiv.innerHTML += `
-      <div class="job ${data.jobInfo[0].tanks[i].shortname}" data-job="${data.jobInfo[0].tanks[i].CSVcode}">
-        <div class="job-icon">
-          <img src="${data.jobInfo[0].tanks[i].jobicon}" alt="">
-        </div>
-        <div class="job-name">${data.jobInfo[0].tanks[i].fullname}</div>
-      </div>
-      `
-    }
+      //* gets data-job from profile instead of choosenjob list
+      let Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
+      let gearType = e.target.getAttribute('data-geartype')
+      // console.log(`${gearType} Type Gear for ${Number(Job)} `);
 
-    //* dans div "healer"
-    for (let i = 0; i < data.jobInfo[1].healers.length; i++) {
+      searchResults.innerHTML = ''
+
       
-      healerDiv.innerHTML += `
-      <div class="job ${data.jobInfo[1].healers[i].shortname}" data-job="${data.jobInfo[1].healers[i].CSVcode}">
-        <div class="job-icon">
-          <img src="${data.jobInfo[1].healers[i].jobicon}" alt="">
-        </div>
-        <div class="job-name">${data.jobInfo[1].healers[i].fullname}</div>
-      </div>
-      `
-    }
+      for (let i = 0; i < data.length; i++) {
 
-    //* dans div "mele"
-    for (let i = 0; i < data.jobInfo[2].meles.length; i++) {
-      
-      meleDiv.innerHTML += `
-      <div class="job ${data.jobInfo[2].meles[i].shortname}" data-job="${data.jobInfo[2].meles[i].CSVcode}">
-        <div class="job-icon">
-          <img src="${data.jobInfo[2].meles[i].jobicon}" alt="">
-        </div>
-        <div class="job-name">${data.jobInfo[2].meles[i].fullname}</div>
-      </div>
-      `
-    }
+        //* will display gear if is equipable by selected job
+        if ( data[i][gearVar.jobReq] === Job &&  data[i][gearVar.equipSlot] === gearType) {
 
-    //* dans div "ranged"
-    for (let i = 0; i < data.jobInfo[3].phys.length; i++) {
-      
-      phyDiv.innerHTML += `
-      <div class="job ${data.jobInfo[3].phys[i].shortname}" data-job="${data.jobInfo[3].phys[i].CSVcode}">
-        <div class="job-icon">
-          <img src="${data.jobInfo[3].phys[i].jobicon}" alt="">
-        </div>
-        <div class="job-name">${data.jobInfo[3].phys[i].fullname}</div>
-      </div>
-      `
-    }
-
-    // dans div "mage"
-    for (let i = 0; i < data.jobInfo[4].mages.length; i++) {
-      
-      mageDiv.innerHTML += `
-      <div class="job ${data.jobInfo[4].mages[i].shortname}" data-job="${data.jobInfo[4].mages[i].CSVcode}">
-        <div class="job-icon">
-          <img src="${data.jobInfo[4].mages[i].jobicon}" alt="">
-        </div>
-        <div class="job-name">${data.jobInfo[4].mages[i].fullname}</div>
-      </div>
-      `
-    }
-
-
-    
-    //! =-=-=-=-=| Job Selector |=-=-=-=-=-=
-    // todo : take job selected into profile 
-
-    //? GPT : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
-    //? --> flatMap(...)
-
-    //! get job icon based on csv number
-    function findJobByCSVcode(code) {
-      // Flatten the arrays inside jobInfo
-      const allJobs = data.jobInfo.flatMap(category => {
-        // Flatten each category's job array
-        return Object.values(category).flat();
-      })
-
-      // Find the job with the matching CSVcode
-      const job = allJobs.find(job => job.CSVcode === code);
-
-      // Return an object with both names if found, otherwise return a not found message
-      // return (job ? job.jobicon : 'Job not found')
-      if (job) {
-        return {
-          jobstone: job.jobstone,
-          jobicon: job.jobicon,
-          shortname: job.shortname
-        };
-      } else {
-        return 'Job not found';
-      }
-    }
-
-
-    jobSelector.addEventListener('click', e => {
-
-      if (e.target.closest('.job').hasAttribute('data-job')){
-    
-        let datajob = e.target.closest('.job').getAttribute('data-job')
-        // console.log(typeOf(datajob));
-
-        const jobInfo = findJobByCSVcode(Number(datajob));
-        // console.log(jobIcon);
-
-        document.querySelector('.profile-job').innerHTML= `
-        <div
-          class="job-change gear-box" 
-          style="background: url('${jobInfo.jobicon}') center/cover" 
-          data-job="${datajob}"
-          data-effect="gear-box--anim" 
-          >
-        </div>
-        `
-        
-        document.querySelector('.job-stone').innerHTML= `
-          <img src="${jobInfo.jobstone}" alt="">
-          <span>${jobInfo.shortname}</span>
-        `
-      
+          searchResults.innerHTML += `
+          <div class="item">
+            <div>
+              <img src="https://lds-img.finalfantasyxiv.com/itemicon/66/665f0061dcd3853e6d3ccf315b7629ac8d0fdf32.png?n6.58" alt="">
+            </div>
+            <div>
+              <span>${data[i][gearVar.SingItemName]}</span>
+              <span>lvl ${data[i][gearVar.levelReq]}, Ilvl ${data[i][gearVar.itemLevel]}</span>
+              <div class="bonuses">
+                <span>class name here : ${data[i][44]}</span>
+                <hr>
+                <div class="stats">
+                  <p><span>dexterity</span> +98</p>
+                  <p><span>critical hit</span> +96</p>
+                  <p><span>vitality</span> +103</p>
+                  <p><span>determination</span> +67</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          `
+        } 
       }
 
-    })
+    }
+
 
   })
-  .catch(error => {console.log("Erreur lors de la récup des données :", error);
+  
+
+  //! =-=-=| On Search |=-=-= 
+  
+  const itemName = `"Auri Gown"`;
+
+  for (let i = 0; i < data.length; i++) {
+
+    //* data[i][1] : to skip any undefined or null values
+    //* .toLowerCase() to make comparisons case-insensitive
+    //* .includes to check if one string is contained within another
+
+    if (data[i][10] && data[i][gearVar.SingItemName].toLowerCase().includes(itemName.toLowerCase())) {
+      itemData.push({ 
+        dataInfo : {
+          itemId : data[i][0],
+          row: i,
+        },
+        "singularName" : data[i][gearVar.SingItemName],
+        // "iconcode" : data[i][icon],
+        // "levelReq" : data[i][levelReq],
+        // "itemLevel" : data[i][itemLevel],
+        "className" : data[i][44],
+        "gearType" : data[i][18],
+      });
+      console.log(data[i]);
+    }
+  }
+  console.log(`${itemName} info :`, itemData);
 })
+.catch(err => console.error('Error fetching CSV:', err));
 
 
 
 
-//! =-=-=-=-=| Gear window popup |=-=-=-=-=
+
+
+
+//! =-=-=-=-=| Window Popup |=-=-=-=-=
+// todo : job selector popup when clicking on job-stone too
 
 function openGearWindow() {
   gearWindow.classList.remove('gear-window-pop-reverse');
@@ -315,7 +338,7 @@ function closeJobSelector() {
 function outsideClickClose(windowName, closingWingowButton) {
   document.addEventListener('click', function(e) {
 
-    //* if target is not in the popupwindow and click is not the closing button of popup
+    //* if target is not in the popupwindow and not the close-button either --> then closes the popup
     if (!windowName.contains(e.target) && e.target !== closingWingowButton) {
 
       //* kept closing even when not opened, so added condition to only close when it has the class that make it open 
@@ -331,7 +354,7 @@ function outsideClickClose(windowName, closingWingowButton) {
 gearGrid.addEventListener('click', e => {
   if (e.target.classList.contains('gear-box')) {
 
-    //* Stop event propagation to prevent the document click listener from being immediately triggered
+    //? Stops event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();
     openGearWindow()
   }
@@ -339,16 +362,26 @@ gearGrid.addEventListener('click', e => {
 outsideClickClose(gearWindow, gearWindowX)
 gearWindowX.addEventListener('click', closeGearWindow)
 
-
-// todo : add way to store name of job clicked before it closes
+//* open job selector when click on profile 'job'
+// // todo : add way to store name of job clicked before it closes
 profile.addEventListener('click', e => {
-  // todo : if clicked on a 'job' => takes name of job and then closes
+  // // todo : if clicked on a 'job' => takes name of job and then closes
 
   if (e.target.classList.contains('job-change')) {
     e.stopPropagation();
     openJobSelector()
+  } 
+})
+outsideClickClose(jobSelectorBG, jobSelectorX)
+jobSelectorX.addEventListener('click', closeJobSelector)
+
+// * open job selector when click on gear 'job-stone'
+document.querySelector('.job-save').addEventListener('click', e => {
+
+  if (e.target.tagName === 'IMG') {
+    e.stopPropagation();
+    openJobSelector();
   }
 })
 outsideClickClose(jobSelectorBG, jobSelectorX)
-
 jobSelectorX.addEventListener('click', closeJobSelector)
