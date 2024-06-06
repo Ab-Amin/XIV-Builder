@@ -203,110 +203,131 @@ fetch("info.json")
 
 
 //! =-=-=-=-=| CSV fetch |=-=-=-=-=
-//todo : quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
-//todo : quand cloque off le search window, enlever toutes les classe draggeable
+/* 
+  ! for pc version
+  todo : quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
+  todo : quand cloque off le search window, enlever toutes les classe draggeable
+*/
 
-fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item.csv')
-.then(response => response.text())
-.then(csvData => {
-  // Parse the CSV data into an array of arrays
-  const rows = csvData.split('\n');
-  const data = rows.map(row => row.split(','));
+async function fetchData() {
+  try {
+    const [firstResponse, secondResponse] = await Promise.all([
+      fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item.csv'),
+      fetch('numberToName.json')
+    ]);
 
-  // console.log(data);
+    //* csv response to text -> then split into rows and columns to convert the CSV ino a .json
+    const csvText = await firstResponse.text();
+    const rows = csvText.split('\n');
+    const csvData = rows.map(row => row.split(','));
 
-  //! =-=-=| Display gear on search-window + Search Gear option
-  // todo : link itemName with a search bar (addEventListener)
-  // todo : add condition that if contains a part of the full gear name, will show every gear that contains that part of the word
-  // todo : log every item name to put them in a "search bar"
-  // todo : sort by equip slot category (if excel[18] == 1/2/3/4/... { => main/off hand,head,body,... })
-  // todo : if scrolling to the point of not seeing search bar => arrow 'back to top' apprears
+    const secondJsonData = await secondResponse.json();
 
-  // example : Allegiance set (head, body, hand, etc) => gear exclusif to gnb, 
-  // if i only write 'allegiance', should display every gear that contains the  word 'allegiance' 
+    // console.log('First fetch data:', csvData);
+    // console.log('Second fetch data:', secondJsonData);
 
 
 
-  //! =-=-=| Gear Dispayed |=-=-=
-  //todo : condition #1 : get job taken and add it as a condition for gears to appear
-  //todo : condition #2 : get data-geartype and same
+    //! =-=-=-=-=| Search Window |=-=-=-=-=
+    // todo : log every item name to put them in a "search bar" (????)
+    // // todo : sort by equip slot category (if excel[18] == 1/2/3/4/... { => main/off hand,head,body,... })
+    // todo : if scrolling to the point of not seeing search bar => arrow 'back to top' apprears
 
-  gearGrid.addEventListener('click', e => {
+    // example : Allegiance set (head, body, hand, etc) => gear exclusif to gnb, 
+    // if i only write 'allegiance', should display every gear that contains the  word 'allegiance' 
 
-    if (document.querySelector('.profile-job').firstElementChild.hasAttribute(`data-job`) && e.target.hasAttribute('data-geartype')) {
-      
-      //* gets data-job from profile instead of choosenjob list
-      let Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
-      let gearType = e.target.getAttribute('data-geartype')
-      // console.log(`${gearType} Type Gear for ${Number(Job)} `);
 
-      searchResults.innerHTML = ''
+    //! =-=-=| Gear to Display |=-=-=
+    // // todo : condition #1 : get job taken and add it as a condition for gears to appear
+    // // todo : condition #2 : get data-geartype
+    /*
+      todo : display every gear that the job can equip, not only the specified one
+      todo ↑ for example : if job is PLD(20) find a way to also have the gear that have PLD in their value (like gla, PLD) to display too
+    */
 
-      
-      for (let i = 0; i < data.length; i++) {
+    gearGrid.addEventListener('click', e => {
 
-        //* will display gear if is equipable by selected job
-        if ( data[i][gearVar.jobReq] === Job &&  data[i][gearVar.equipSlot] === gearType) {
+      if (document.querySelector('.profile-job').firstElementChild.hasAttribute(`data-job`) && e.target.hasAttribute('data-geartype')) {
+        
+        //* gets data-job from profile instead of choosenjob list
+        let Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
+        let gearType = e.target.getAttribute('data-geartype')
+        // console.log(`${gearType} Type Gear for ${Number(Job)} `);
 
-          searchResults.innerHTML += `
-          <div class="item">
-            <div>
-              <img src="https://lds-img.finalfantasyxiv.com/itemicon/66/665f0061dcd3853e6d3ccf315b7629ac8d0fdf32.png?n6.58" alt="">
-            </div>
-            <div>
-              <span>${data[i][gearVar.SingItemName]}</span>
-              <span>lvl ${data[i][gearVar.levelReq]}, Ilvl ${data[i][gearVar.itemLevel]}</span>
-              <div class="bonuses">
-                <span>class name here : ${data[i][44]}</span>
-                <hr>
-                <div class="stats">
-                  <p><span>dexterity</span> +98</p>
-                  <p><span>critical hit</span> +96</p>
-                  <p><span>vitality</span> +103</p>
-                  <p><span>determination</span> +67</p>
+        searchResults.innerHTML = ''
+
+        
+        for (let i = 0; i < csvData.length; i++) {
+
+          //* will display gear if is equipable by selected job
+          if ( csvData[i][gearVar.jobReq] === Job &&  csvData[i][gearVar.equipSlot] === gearType) {
+
+            searchResults.innerHTML += `
+            <div class="item">
+              <div>
+                <img src="https://lds-img.finalfantasyxiv.com/itemicon/66/665f0061dcd3853e6d3ccf315b7629ac8d0fdf32.png?n6.58" alt="">
+              </div>
+              <div>
+                <span>${csvData[i][gearVar.SingItemName]}</span>
+                <span>lvl ${csvData[i][gearVar.levelReq]}, Ilvl ${csvData[i][gearVar.itemLevel]}</span>
+                <div class="bonuses">
+                  <span>class name here : ${csvData[i][44]}</span>
+                  <hr>
+                  <div class="stats">
+                    <p><span>dexterity</span> +98</p>
+                    <p><span>critical hit</span> +96</p>
+                    <p><span>vitality</span> +103</p>
+                    <p><span>determination</span> +67</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          `
-        } 
+            `
+          } 
+
+        }
+
       }
 
+    })
+
+
+    //! =-=-=| On Search |=-=-= 
+    // todo : link itemName with a search bar (addEventListener)
+    // todo : add condition that if contains a part of the full gear name, will show every gear that contains that part of the word
+
+    const itemName = `"Auri Gown"`;
+
+    for (let i = 0; i < csvData.length; i++) {
+
+      //* data[i][1] : to skip any undefined or null values
+      //* .toLowerCase() to make comparisons case-insensitive
+      //* .includes to check if one string is contained within another
+
+      if (csvData[i][10] && csvData[i][gearVar.SingItemName].toLowerCase().includes(itemName.toLowerCase())) {
+        itemData.push({ 
+          dataInfo : {
+            itemId : csvData[i][0],
+            row: i,
+          },
+          "singularName" : csvData[i][gearVar.SingItemName],
+          // "iconcode" : data[i][icon],
+          // "levelReq" : data[i][levelReq],
+          // "itemLevel" : data[i][itemLevel],
+          "className" : csvData[i][44],
+          "gearType" : csvData[i][18],
+        });
+        console.log(csvData[i]);
+      }
     }
+    console.log(`${itemName} info :`, itemData);
 
-
-  })
-  
-
-  //! =-=-=| On Search |=-=-= 
-  
-  const itemName = `"Auri Gown"`;
-
-  for (let i = 0; i < data.length; i++) {
-
-    //* data[i][1] : to skip any undefined or null values
-    //* .toLowerCase() to make comparisons case-insensitive
-    //* .includes to check if one string is contained within another
-
-    if (data[i][10] && data[i][gearVar.SingItemName].toLowerCase().includes(itemName.toLowerCase())) {
-      itemData.push({ 
-        dataInfo : {
-          itemId : data[i][0],
-          row: i,
-        },
-        "singularName" : data[i][gearVar.SingItemName],
-        // "iconcode" : data[i][icon],
-        // "levelReq" : data[i][levelReq],
-        // "itemLevel" : data[i][itemLevel],
-        "className" : data[i][44],
-        "gearType" : data[i][18],
-      });
-      console.log(data[i]);
-    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
   }
-  console.log(`${itemName} info :`, itemData);
-})
-.catch(err => console.error('Error fetching CSV:', err));
+}
+
+fetchData();
 
 
 
