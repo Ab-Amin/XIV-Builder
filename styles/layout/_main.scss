@@ -1,15 +1,15 @@
 .big-wrapper{
-  height: 100%;
-  width: 100%;
   @media screen and (min-width:800px) {
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
+  // height: 100%;
+  // width: 100%;
+  margin-bottom: 2rem;
 
   main{
     @media screen and (min-width:800px) {
-  
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       grid-template-rows: 75px 1fr;
@@ -44,6 +44,7 @@
         border-radius: 0 0 0 15px;
       }
     }
+    
   
     // height: 100%;
     border: 2px groove rgb(188, 173, 74);

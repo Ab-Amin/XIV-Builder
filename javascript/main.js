@@ -257,12 +257,20 @@ async function fetchData() {
 
         searchResults.innerHTML = ''
 
-        
+        // let PldOrNot;
+
         for (let i = 0; i < csvData.length; i++) {
 
-          //* will display gear if is equipable by selected job
-          if ( csvData[i][gearVar.jobReq] === Job &&  csvData[i][gearVar.equipSlot] === gearType) {
+          // todo : here -> if job is paladin, switch equipslot from main hand (13) to main hand (1) 
+          // if (Job === 20) {
+          //   let PldOrNot = 13
+          // } else {
+          //   let PldOrNot = csvData[i][gearVar.jobReq]
+          // }
 
+          //* will display gear if is equipable by selected job
+          if ( csvData[i][gearVar.jobReq] === Job && csvData[i][gearVar.equipSlot] === gearType) {
+            
             searchResults.innerHTML += `
             <div class="item">
               <div>

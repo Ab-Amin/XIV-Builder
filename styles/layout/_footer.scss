@@ -1,0 +1,22 @@
+footer{
+  // position: absolute;
+  // bottom: 0;
+  // z-index: 1;
+
+  width: 100%;
+
+  background-color: #242024;
+  text-align: center;
+  padding: 15px 0;  
+  
+  > div{
+    background-color: #242024;
+    
+    em{
+      color: rgb(202, 202, 202);
+      font-size: 14px;
+    }
+
+  }
+
+}

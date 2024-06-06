@@ -6,16 +6,26 @@
 html, body{
   @media screen and (min-width:800px) {
     min-width: 800px;
-
   }
   overflow-x: hidden;
   position: relative;
 }
+
 body{
+  @media screen and (min-width:1024px) {
+    height: 100vh;
+  }
+ 
   background: url('/img/wp10255304-final-fantasy-xiv-endwalker-wallpapers.png') center/cover no-repeat;
-  width: 100vw;
-  height: 100vh;
-  overflow-x: hidden;
+  height: 100%;
+  width: 100%;
+  // overflow-x: hidden;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
 }
 
 *{
@@ -23,16 +33,21 @@ body{
 }
 
 .wrapper{
+  @media screen and (min-width:600px) {
+    min-width: 500px;
+    max-width: 80%;
+    margin: 0 auto;
+  }
   @media screen and (min-width:800px) {
     min-width: 800px;
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     width: fit-content;
   }
   background-color: #242024;
   // =-=> pc ver
   // max-width: 1200px;
-  min-width: 300px;
+  min-width: 350px;
   max-width: 375px;
   margin: 0 auto;
 }
