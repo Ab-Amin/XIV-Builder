@@ -15,6 +15,7 @@ body{
   background: url('/img/wp10255304-final-fantasy-xiv-endwalker-wallpapers.png') center/cover no-repeat;
   width: 100vw;
   height: 100vh;
+  overflow-x: hidden;
 }
 
 *{
@@ -28,6 +29,7 @@ body{
     margin: 0 auto;
     width: fit-content;
   }
+  background-color: #242024;
   // =-=> pc ver
   // max-width: 1200px;
   min-width: 300px;

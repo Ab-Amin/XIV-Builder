@@ -208,9 +208,10 @@ fetch("info.json")
   todo : quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
   todo : quand cloque off le search window, enlever toutes les classe draggeable
 */
-
 async function fetchData() {
   try {
+
+    //! Add Icon API fetch
     const [firstResponse, secondResponse] = await Promise.all([
       fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item.csv'),
       fetch('numberToName.json')
