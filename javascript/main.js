@@ -13,20 +13,21 @@
 // fetch("https://xivapi.com/character/search?name=Nima+Min&server=Twintania&private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0", { mode: 'cors' })
 // 	.then(response => response.json())
 // 	.then(data => {
-//     console.log(console.info(data));
+//     console.log(data);
 //   })
 //   .catch(error => {console.log("Erreur lors de la récup des données :", error);
 // })
 
-// fetch("https://xivapi.com/character/36077235&private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0", { mode: 'cors' })
-// 	.then(response => response.json())
-// 	.then(data => {
-//     console.log(console.info(data));
-//   })
-//   .catch(error => {console.log("Erreur lors de la récup des données :", error);
-// })
+fetch("https://api.kalilistic.io/v1/lodestone/player?playerName=Nima%20Min&worldName=Twintania")
+	.then(response => response.json())
+	.then(data => {
+    console.log(console.info(data));
+  })
+  .catch(error => {console.log("Erreur lors de la récup des données :", error);
+})
+
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-// https://docs.google.com/spreadsheets/d/1KtWCELA7ggvYXYumxIib-n3ZbD1UKlnaXyQiy-6LiTI/edit?usp=sharing
+// todo : can save equiped set (by jobs) if logged in (firebase of smthing ?)
 
 
 //! =-=-=-=-=| Variables |=-=-=-=-=
@@ -154,7 +155,8 @@ fetch("info.json")
       return {
         jobstone: job.jobstone,
         jobicon: job.jobicon,
-        shortname: job.shortname
+        shortname: job.shortname,
+        fullname: job.fullname
       };
     } else {
       return 'Job not found';
@@ -192,7 +194,7 @@ fetch("info.json")
       `
       document.querySelector('.job-stone').innerHTML= `
         <img src="${jobInfo.jobstone}" alt="">
-        <span>${jobInfo.shortname}</span>
+        <span data-jobname="${jobInfo.fullname}">${jobInfo.shortname}</span>
       `
     }
 
@@ -274,7 +276,7 @@ async function fetchData() {
 
           //* will display gear if is equipable by selected job
           if ( csvData[i][gearVar.jobReq] === Job && csvData[i][gearVar.equipSlot] === gearType) {
-            
+            // console.log(typeof(Job));
 
             //! Gear Icons (from XIVAPI)
             let icon_id = csvData[i][gearVar.icons]
@@ -283,8 +285,7 @@ async function fetchData() {
             if (icon_id.length >= 6){
               // icon_id = pad(5, "0", pad_left)
               icon_id.padStart(5, "0")
-            }
-            else{
+            } else{
               // icon_id = '0' + pad(5, "0", pad_left)
               icon_id = '0' + icon_id.padStart(5, "0")
             }
@@ -293,14 +294,33 @@ async function fetchData() {
             if (icon_id.length >= 6){
               // folder_id = icon_id[0] + icon_id[1] + icon_id[2] + '000'
               folder_id = icon_id[0] + icon_id[1] + icon_id[2] + '000'
-            }
-            else{
+            } else{
               // folder_id = 0 + icon_id[1] + icon_id[2] + '000'
               folder_id = 0 + icon_id[1] + icon_id[2] + '000'
             }
 
             let path = `${folder_id}/${icon_id}`
             // console.log(csvData[i][gearVar.itemId] + ' ==> ' +  path);
+
+            //! Stats display
+            // todo : find way to translate numbers to name and asign them to the right stats ... (BaseParam[0,1,2,3] -> BaseParamValue[0,1,2,3])
+
+            /*
+              BaseParam (number to name)
+              1 = strength
+              2 = dexterity
+              3 = vitality
+              4 = intelligence
+              5 = mind
+              6 = piety
+              22 = direct hit rate
+              27 = critical hit
+              44 = determination
+              45 = skill speed
+              46 = spell speed
+              184 = tenacity
+            */
+
 
             searchResults.innerHTML += `
             <div class="item">
@@ -325,6 +345,27 @@ async function fetchData() {
             `
           } 
 
+
+          // todo : if not a paladin ==> 'nothing here' message when looking for off-hand gear 
+          // let getAttributeDataGearType = e.target.getAttribute('data-geartype')
+          // if ( getAttributeDataGearType = '2' && Job != '20') {
+
+          //   searchResults.innerHTML= `
+          //   <div class="item">
+          //     <div style="
+          //       color: white;
+          //       font-size: 14px;
+          //       width: 100%;
+          //       display: flex;
+          //       justify-content: center;
+          //       align-items: center;
+          //       ">
+          //       No Item are available for 'job' here :&#41;
+          //     </div>
+          //   </div>
+          //   `
+          // }
+
         }
 
       }
@@ -340,7 +381,7 @@ async function fetchData() {
 
     for (let i = 0; i < csvData.length; i++) {
 
-      //* data[i][1] : to skip any undefined or null values
+      //* data[i][1] : to skip undefined or null values
       //* .toLowerCase() to make comparisons case-insensitive
       //* .includes to check if one string is contained within another
 
@@ -351,11 +392,22 @@ async function fetchData() {
             row: i,
           },
           "singularName" : csvData[i][gearVar.SingItemName],
-          // "iconcode" : data[i][icon],
-          // "levelReq" : data[i][levelReq],
-          // "itemLevel" : data[i][itemLevel],
-          "className" : csvData[i][44],
-          "gearType" : csvData[i][18],
+          // "BlockRate" : csvData[i][62],
+          // "Block" : csvData[i][63],
+          // "Defense{Phys}" : csvData[i][64],
+          // "Defense{Mag}" : csvData[i][65],
+          // "BaseParam[0]" : csvData[i][66],
+          // "BaseParamValue[0]" : csvData[i][67],
+          // "BaseParam[1]" : csvData[i][68],
+          // "BaseParamValue[1]" : csvData[i][69],
+          // "BaseParam[2]" : csvData[i][70],
+          // "BaseParamValue[2]" : csvData[i][71],
+          // "BaseParam[3]" : csvData[i][72],
+          // "BaseParamValue[3]" : csvData[i][73],
+          // "BaseParam[4]" : csvData[i][74],
+          // "BaseParamValue[4]" : csvData[i][75],
+          // "BaseParam[5]" : csvData[i][76],
+          // "BaseParamValue[5]" : csvData[i][77]
         });
         console.log(csvData[i]);
       }
