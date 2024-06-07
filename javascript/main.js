@@ -246,6 +246,10 @@ async function fetchData() {
       todo ↑ for example : if job is PLD(20) find a way to also have the gear that have PLD in their value (like gla, PLD) to display too
     */
 
+    
+
+
+
     gearGrid.addEventListener('click', e => {
 
       if (document.querySelector('.profile-job').firstElementChild.hasAttribute(`data-job`) && e.target.hasAttribute('data-geartype')) {
@@ -271,10 +275,37 @@ async function fetchData() {
           //* will display gear if is equipable by selected job
           if ( csvData[i][gearVar.jobReq] === Job && csvData[i][gearVar.equipSlot] === gearType) {
             
+
+            //! Gear Icons (from XIVAPI)
+            let icon_id = csvData[i][gearVar.icons]
+            let folder_id;
+            //* first we need to add padding to the icon_id
+            if (icon_id.length >= 6){
+              // icon_id = pad(5, "0", pad_left)
+              icon_id.padStart(5, "0")
+            }
+            else{
+              // icon_id = '0' + pad(5, "0", pad_left)
+              icon_id = '0' + icon_id.padStart(5, "0")
+            }
+
+            //* Now we can build the folder from the padded icon_id
+            if (icon_id.length >= 6){
+              // folder_id = icon_id[0] + icon_id[1] + icon_id[2] + '000'
+              folder_id = icon_id[0] + icon_id[1] + icon_id[2] + '000'
+            }
+            else{
+              // folder_id = 0 + icon_id[1] + icon_id[2] + '000'
+              folder_id = 0 + icon_id[1] + icon_id[2] + '000'
+            }
+
+            let path = `${folder_id}/${icon_id}`
+            // console.log(csvData[i][gearVar.itemId] + ' ==> ' +  path);
+
             searchResults.innerHTML += `
             <div class="item">
               <div>
-                <img src="https://lds-img.finalfantasyxiv.com/itemicon/66/665f0061dcd3853e6d3ccf315b7629ac8d0fdf32.png?n6.58" alt="">
+                <img src="https://xivapi.com/i/${path}.png" alt="">
               </div>
               <div>
                 <span>${csvData[i][gearVar.SingItemName]}</span>
@@ -305,7 +336,7 @@ async function fetchData() {
     // todo : link itemName with a search bar (addEventListener)
     // todo : add condition that if contains a part of the full gear name, will show every gear that contains that part of the word
 
-    const itemName = `"Auri Gown"`;
+    const itemName = `"Drachen Armet"`;
 
     for (let i = 0; i < csvData.length; i++) {
 
