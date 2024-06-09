@@ -1,5 +1,7 @@
 // xivapi private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0
 
+//! Fetch test...
+
 // fetch("https://xivapi.com/item/1675?columns=ID,Name,Description,Lv,LevelItem,ClassJobCategory.Name&private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0", { mode: 'cors' })
 // 	.then(response => response.json())
 // 	.then(data => {
@@ -18,13 +20,13 @@
 //   .catch(error => {console.log("Erreur lors de la récup des données :", error);
 // })
 
-fetch("https://api.kalilistic.io/v1/lodestone/player?playerName=Nima%20Min&worldName=Twintania")
-	.then(response => response.json())
-	.then(data => {
-    console.log(console.info(data));
-  })
-  .catch(error => {console.log("Erreur lors de la récup des données :", error);
-})
+// fetch("https://api.kalilistic.io/v1/lodestone/player?playerName=Nima%20Min&worldName=Twintania")
+// 	.then(response => response.json())
+// 	.then(data => {
+//     console.log(console.info(data));
+//   })
+//   .catch(error => {console.log("Erreur lors de la récup des données :", error);
+// })
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // todo : can save equiped set (by jobs) if logged in (firebase of smthing ?)
@@ -248,17 +250,14 @@ async function fetchData() {
       todo ↑ for example : if job is PLD(20) find a way to also have the gear that have PLD in their value (like gla, PLD) to display too
     */
 
-    
-
-
-
     gearGrid.addEventListener('click', e => {
 
-      if (document.querySelector('.profile-job').firstElementChild.hasAttribute(`data-job`) && e.target.hasAttribute('data-geartype')) {
-        
+      //* if a job has been choosen + clicked on a gear slot
+      if (document.querySelector('.profile-job').firstElementChild.hasAttribute(`data-job`) && e.target.closest('.gear-box').hasAttribute('data-geartype')) {
+
         //* gets data-job from profile instead of choosenjob list
         let Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
-        let gearType = e.target.getAttribute('data-geartype')
+        let gearType = e.target.closest('.gear-box').getAttribute('data-geartype')
         // console.log(`${gearType} Type Gear for ${Number(Job)} `);
 
         searchResults.innerHTML = ''
@@ -323,8 +322,8 @@ async function fetchData() {
 
 
             searchResults.innerHTML += `
-            <div class="item">
-              <div>
+            <div class="item" data-itemid="${csvData[i][gearVar.itemId]}" data-geartype="${gearType}">
+              <div data-iconId="${path}">
                 <img src="https://xivapi.com/i/${path}.png" alt="">
               </div>
               <div>
@@ -409,10 +408,53 @@ async function fetchData() {
           // "BaseParam[5]" : csvData[i][76],
           // "BaseParamValue[5]" : csvData[i][77]
         });
-        console.log(csvData[i]);
+        // console.log(csvData[i]);
       }
     }
     console.log(`${itemName} info :`, itemData);
+
+
+    //! Gearing (click on gear to equip it)
+    /*
+      todo : if target has class 'item' and 'data-itemid' and 'data-geartype' 
+      * --> take id that and add it to the corresponding gear type on equipement (with fetch since i should have the id and gearslot and icon) 
+      * --> funciton to close the search popup
+    */
+
+    searchResults.addEventListener('click', e => {
+      if (e.target.classList.contains('item') || e.target.closest('.item')){
+        
+        let dataItemId = e.target.closest('.item').getAttribute('data-itemid')
+        let dataGearSlot = e.target.closest('.item').getAttribute('data-geartype')
+        let dataIconId = e.target.closest('.item').firstElementChild.getAttribute('data-iconId')
+        
+        let nameOfItem;
+
+        for (let i = 0; i < csvData.length; i++) {
+          if ( Number(csvData[i][gearVar.itemId]) === Number(dataItemId) ) {
+            console.log(csvData[i]);
+          }
+        }
+        
+
+        console.log(`Item Id : ${dataItemId} | Gear Slot : ${dataGearSlot} | Icon Id : ${dataIconId}`);
+
+        closeGearWindow()
+
+        // * --> go to gearGrid childelement(or smthg like that ._.) that has 'data-geartype' mathing the 'dataGearSlot' and then innerHtml in it the gear
+        
+        if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
+
+          gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
+            <img src="https://xivapi.com/i/${dataIconId}.png" alt="" title="043088">
+          `
+
+        }
+    
+      }
+    })
+
+    
 
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -465,7 +507,7 @@ function outsideClickClose(windowName, closingWingowButton) {
 }
 
 gearGrid.addEventListener('click', e => {
-  if (e.target.classList.contains('gear-box')) {
+  if (e.target.classList.contains('gear-box') || e.target.closest('.gear-box').hasAttribute('data-geartype')) {
 
     //? Stops event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();

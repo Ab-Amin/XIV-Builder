@@ -1,4 +1,4 @@
-// data numbers to name
+// data numbers to name (from csv)
 export const itemId = 0;
 export const SingItemName = 10;
 export const itemLevel = 12;

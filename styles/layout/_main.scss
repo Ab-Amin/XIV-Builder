@@ -163,6 +163,17 @@
             height: 55px;
             
             justify-self: center;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            img{
+              width: 85%;
+              height: 85%;
+              margin-bottom: 4px;
+            }
+
           }
   
           // =-=-=-=| Gear Searching PopUp |=-=-=-=
