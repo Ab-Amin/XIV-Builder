@@ -211,7 +211,7 @@ fetch("info.json")
   todo : (idea) quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
   todo : (idea) quand cloque off le search window, enlever toutes les classe draggeable
 
-  ! --> Job Selector
+  ! --> Job Selector + Saving
   // todo : take job selected into profile 
   // todo : job selector popup when clicking on job-stone too
   todo : give warning if didn't save, will lose previous 'build' if no -> empty build, if yes -> save + change job
@@ -232,6 +232,7 @@ fetch("info.json")
   todo [shortened from ~10s to ~4s] : optimisation (don't display all items at once, only when is about to enter(scroll) the viewport add more item) 
   todo : add a loading while waiting for item to appear
   todo : if scrolling to the point of not seeing search bar => arrow 'back to top' apprears
+  todo : ability to remove gear
 
   ! --> (test) to get accessories gear to appear on search window 
   // todo : Need to get the shortname of job with the number (should do with firstJsonData) 
@@ -240,36 +241,38 @@ fetch("info.json")
   
   ! --> Gear Stats
   todo : find way to translate numbers to name and asign them to the right stats ... (BaseParam[0,1,2,3] -> BaseParamValue[0,1,2,3])
-    - BaseParam[0, 1, 2, 3] (don't do 4 & 5 yet)
-    - 1 = strength
-    - 2 = dexterity
-    - 3 = vitality
-    - 4 = intelligence
-    - 5 = mind
-    - 6 = piety
-    - 22 = direct hit rate
-    - 27 = critical hit
-    - 44 = determination
-    - 45 = skill speed
-    - 46 = spell speed
-    - 184 = tenacity
-  * more stats :
-    -  62 = "BlockRate",
-    -  63 = "Block",
-    -  64 = "Defense{Phys}",
-    -  65 = "Defense{Mag}",
-    -  66 = "BaseParam[0]",
-    -  67 = "BaseParamValue[0]",
-    -  68 = "BaseParam[1]",
-    -  69 = "BaseParamValue[1]",
-    -  70 = "BaseParam[2]",
-    -  71 = "BaseParamValue[2]",
-    -  72 = "BaseParam[3]",
-    -  73 = "BaseParamValue[3]",
+    -  [62] -> "BlockRate",
+    -  [63] -> "Block",
+    -  [64] -> "Defense{Phys}",
+    -  [65] -> "Defense{Mag}",
+    -  [66] -> "BaseParam[0]",
+    -  [67] -> "BaseParamValue[0]",
+    -  [68] -> "BaseParam[1]",
+    -  [69] -> "BaseParamValue[1]",
+    -  [70] -> "BaseParam[2]",
+    -  [71] -> "BaseParamValue[2]",
+    -  [72] -> "BaseParam[3]",
+    -  [73] -> "BaseParamValue[3]",
     x  74 = "BaseParam[4]",
     x  75 = "BaseParamValue[4]",
     x  76 = "BaseParam[5]",
     x  77 = "BaseParamValue[5]" 
+
+    * Add to NumberToName.json ?
+    - BaseParam[0, 1, 2, 3] (don't do 4 & 5 yet)
+    - "1" = strength
+    - "2" = dexterity
+    - "3" = vitality
+    - "4" = intelligence
+    - "5" = mind
+    - "6" = piety
+    - "22" = direct hit rate
+    - "27" = critical hit
+    - "44" = determination
+    - "45" = skill speed
+    - "46" = spell speed
+    - "184" = tenacity
+
   
 */
 
@@ -286,9 +289,23 @@ function onJobChange() {
   //      -> and equip the new job selected
 }
 
+function startLoading() {
+  console.log('Loading --> dsiplay block');
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('loading').offsetHeight; // - Trigger a reflow, flushing the CSS changes
+}
+
+function stopLoading() {
+  console.log('Loading --> dsiplay none');
+  document.getElementById('loading').style.display = 'none';
+
+}
+
 //! Fetch and Main JavaScript
 async function fetchData() {
   try {
+    startLoading()
+
     const [csvResponse, infoResponse, numberToNameResponse] = await Promise.all([
       fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item.csv'),
       fetch('info.json'), // Example URL for second fetch
@@ -304,16 +321,20 @@ async function fetchData() {
     const numberToNameData = await numberToNameResponse.json();
 
     return { csvData, infoData, numberToNameData }; // Return an object containing all data
-  } catch (error) {
+
+    } catch (error) {
     console.error('Error fetching data:', error);
     return [];
   }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+
   const { csvData, infoData, numberToNameData } = await fetchData();
   const gearGrid = document.querySelector('.gear-grid');
   const searchResults = document.querySelector('.search-results');
+
+  console.log(csvData);
 
   const fullNames = numberToNameData.numToName;
   // console.log('fullName', fullNames);
@@ -396,45 +417,59 @@ document.addEventListener('DOMContentLoaded', async () => {
     const gearType1 = e.target.closest('.gear-box').getAttribute('data-geartype1')
     const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
 
+    
     //* Will display gear if has selected a job and has clicked on a gear slot
     if (Job && gearType || gearType1) {
 
-      searchResults.innerHTML = ''; // Reset
-      currentIndex = 0;
-      // console.log(Job);
-
-      if (gearType1 && fullJobNbrList().includes(('20')) ) {
-        //* Condition only for PLD's main weapon (since his main-hand number is 1 instead of 13 like everyone else ._.)
-        // console.log('on PLD weapon');
-
-        //* Copy csvData but filter it and only takes items that are related to job chosen and to gear slot clicked
-        filteredData = csvData.filter(item => fullJobNbrList().includes(item[gearVar.jobReq]) && item[gearVar.equipSlot] === gearType1);
-
-        // todo : change the log to put it in the DOM so user can see how many results found and for what equip (for fun c:)
-        console.log(`Found ${filteredData.length} Items for '${Job}' on '${gearType1}'`);
-        loadMoreItems();
-      } else if (gearType && fullJobNbrList().includes(Job)) {
-        // console.log('Other');
-
-        //* Copy csvData but filter it and only takes items that are related to job chosen and to gear slot clicked
-        filteredData = csvData.filter(item => fullJobNbrList().includes(item[gearVar.jobReq]) && item[gearVar.equipSlot] === gearType);
-
-        // todo : same ↑
-        console.log(`Found ${filteredData.length} Items for '${nbrToNames(String(Job), 0)}' to equip on '${nbrToNames(gearType, 1)}'`);
-        loadMoreItems();
-
-        //* In case they click on 'off-hand' gear slot (no shields)
-        if (filteredData.length === 0) {
-          searchResults.innerHTML = `
-            <div class="item">
-              <div style="color:white;font-size:14px;width:100%;display:flex;justify-content:center;align-items:center;">
-                No Item Found In Here For Your chosen Job
+      startLoading() //* doesn't appear until the very end... ¯\_(ツ)_/¯
+      
+      try{
+  
+        searchResults.innerHTML = ''; // Reset
+        currentIndex = 0;
+        // console.log(Job);
+  
+        if (gearType1 && fullJobNbrList().includes(('20')) ) {
+          //* Condition only for PLD's main weapon (since his main-hand number is 1 instead of 13 like everyone else ._.)
+          // console.log('on PLD weapon');
+          
+          //* Copy csvData but filter it and only takes items that are related to job chosen and to gear slot clicked
+          filteredData = csvData.filter(item => fullJobNbrList().includes(item[gearVar.jobReq]) && item[gearVar.equipSlot] === gearType1);
+  
+          // todo : change the log to put it in the DOM so user can see how many results found and for what equip (for fun c:)
+          console.log(`Found ${filteredData.length} Items for '${Job}' on '${gearType1}'`);
+          loadMoreItems();
+        } else if (gearType && fullJobNbrList().includes(Job)) {
+          // console.log('Other');
+  
+          //* Copy csvData but filter it and only takes items that are related to job chosen and to gear slot clicked
+          filteredData = csvData.filter(item => fullJobNbrList().includes(item[gearVar.jobReq]) && item[gearVar.equipSlot] === gearType);
+  
+          // todo : same ↑
+          console.log(`Found ${filteredData.length} Items for '${nbrToNames(String(Job), 0)}' to equip on '${nbrToNames(gearType, 1)}'`);
+          loadMoreItems();
+  
+          //* In case they click on 'off-hand' gear slot (no shields)
+          if (filteredData.length === 0) {
+            searchResults.innerHTML = `
+              <div class="item">
+                <div style="color:white;font-size:14px;width:100%;display:flex;justify-content:center;align-items:center;">
+                  No Item Found In Here For Your chosen Job
+                </div>
               </div>
-            </div>
-          `
+            `
+          }
+  
         }
 
-      } 
+      }
+      catch (error) {
+        console.error('Error processing data:', error);
+      } finally {
+        setTimeout(() => {
+          stopLoading()
+        }, 1);
+      }
       
     }
 
@@ -489,8 +524,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // console.log('fullNames : ', fullNames);
 
   function loadMoreItems() {
+
     const itemsToLoad = filteredData.slice(currentIndex, currentIndex + itemsPerBatch);
-    console.log(itemsToLoad);
+    // console.log(itemsToLoad);
     itemsToLoad.forEach(item => {
 
       // console.log(item);
@@ -517,9 +553,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         </div>
       `;
+
     });
     currentIndex += itemsPerBatch;
     observeLastItem();
+
   }
 
   // todo : take as param classJobCategory -> look through numberToName.json if exist as proprety -> then takes its value
@@ -548,8 +586,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       let dataItemId = e.target.closest('.item').getAttribute('data-itemid')
       let dataGearSlot = e.target.closest('.item').getAttribute('data-geartype')
       let dataIconId = e.target.closest('.item').firstElementChild.getAttribute('data-iconId')
-    
       let nameOfItem;
+    
       for (let i = 0; i < csvData.length; i++) {
         if ( Number(csvData[i][gearVar.itemId]) === Number(dataItemId) ) {
           console.log(csvData[i]);
@@ -561,7 +599,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
       if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
         gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
-          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" title="043088">
+          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-itemid="${dataItemId}" title="Item Name here">
         `
       }
   
@@ -603,7 +641,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   //* option 'rootMargin' adds a margin to observer so it doesn't wait to exactly come into view of last item
   //* -> will load more item a bit before actually reaching the end (more 'fluid' when scrolling at the end)
 
-});
+  stopLoading()
+})
+
 
 fetchData()
 
@@ -651,6 +691,7 @@ gearGrid.addEventListener('click', e => {
     //? Stops event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();
     openGearWindow()
+
   }
 })
 outsideClickClose(gearWindow, gearWindowX)

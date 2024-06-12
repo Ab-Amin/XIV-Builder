@@ -1,3 +1,13 @@
+@keyframes rota {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
 .big-wrapper{
   @media screen and (min-width:800px) {
     display: flex;
@@ -67,7 +77,7 @@
       // =-=-=-=| Main |=-=-=-=
       .bg-img{
         position: relative;
-        display: grid;
+        // display: grid;
         align-items: center;
         
         background-color: rgba($color: #363636, $alpha: 0.4);
@@ -78,6 +88,29 @@
         width: 100%;
         margin: 0 auto;
         border-radius: 10px;
+
+        // ! HERE
+
+        #loading{
+          position: absolute;
+          top: 50%;
+          right: 50%;
+          transform: translate(50%, -50%);  
+          width: 50px;
+          height: 50px;
+          z-index: 3;
+
+          #loader-1 {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgb(255 255 255 / 16%);
+            border-bottom-color: #8f44fd;
+            border-radius: 50%;
+            display: block;
+            box-sizing: border-box;
+            animation: rota 1s linear infinite;
+          }
+        }
   
         // =-=-=-=| Job Stone + Short Job Name |=-=-=-=
         .job-save{
@@ -156,26 +189,29 @@
           > div{
             display: grid;
             row-gap: 1rem;
-          }
+
+            .gear-box{
+              width: 55px;
+              height: 55px;
+              
+              justify-self: center;
   
-          > div .gear-box{
-            width: 55px;
-            height: 55px;
-            
-            justify-self: center;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            img{
-              width: 85%;
-              height: 85%;
-              margin-bottom: 4px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+  
+              img{
+                width: 85%;
+                height: 85%;
+                margin-bottom: 4px;
+              }
+  
             }
 
-          }
-  
+          }          
+
+          
+
           // =-=-=-=| Gear Searching PopUp |=-=-=-=
           .search-window{
             background-color: rgba($color: #242424, $alpha: 0.8);
@@ -346,6 +382,7 @@
   }
 
 }
+
 
 
 
