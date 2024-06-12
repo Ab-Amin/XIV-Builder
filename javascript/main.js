@@ -207,7 +207,7 @@ fetch("info.json")
 
 //! =-=-=|> ToDo Notes : (with 'better Comments' plugin on vsCode)
 /* 
-  ! For Pc Version
+  ! For Pc Version (last)
   todo : (idea) quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
   todo : (idea) quand cloque off le search window, enlever toutes les classe draggeable
 
@@ -315,6 +315,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const gearGrid = document.querySelector('.gear-grid');
   const searchResults = document.querySelector('.search-results');
 
+  const fullNames = numberToNameData.numToName;
+  // console.log('fullName', fullNames);
+
   let filteredData = [];
   let currentIndex = 0;
   const itemsPerBatch = 20;
@@ -389,8 +392,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   gearGrid.addEventListener('click', e => {
 
-    let gearType = e.target.closest('.gear-box').getAttribute('data-geartype');
-    let gearType1 = e.target.closest('.gear-box').getAttribute('data-geartype1')
+    const gearType = e.target.closest('.gear-box').getAttribute('data-geartype');
+    const gearType1 = e.target.closest('.gear-box').getAttribute('data-geartype1')
     const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
 
     //* Will display gear if has selected a job and has clicked on a gear slot
@@ -407,6 +410,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         //* Copy csvData but filter it and only takes items that are related to job chosen and to gear slot clicked
         filteredData = csvData.filter(item => fullJobNbrList().includes(item[gearVar.jobReq]) && item[gearVar.equipSlot] === gearType1);
 
+        // todo : change the log to put it in the DOM so user can see how many results found and for what equip (for fun c:)
         console.log(`Found ${filteredData.length} Items for '${Job}' on '${gearType1}'`);
         loadMoreItems();
       } else if (gearType && fullJobNbrList().includes(Job)) {
@@ -415,7 +419,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         //* Copy csvData but filter it and only takes items that are related to job chosen and to gear slot clicked
         filteredData = csvData.filter(item => fullJobNbrList().includes(item[gearVar.jobReq]) && item[gearVar.equipSlot] === gearType);
 
-        console.log(`Found ${filteredData.length} Items for '${Job}' to equip on '${gearType}'`);
+        // todo : same ↑
+        console.log(`Found ${filteredData.length} Items for '${nbrToNames(String(Job), 0)}' to equip on '${nbrToNames(gearType, 1)}'`);
         loadMoreItems();
 
         //* In case they click on 'off-hand' gear slot (no shields)
@@ -433,24 +438,74 @@ document.addEventListener('DOMContentLoaded', async () => {
       
     }
 
+    //! (wip idea) On Search 
+    // todo : link itemName with a search bar (addEventListener)
+    // todo : add condition that if contains a part of the full gear name, will show every gear that contains that part of the word
+    /*
+      - brouillon
+
+      const itemName = `"Allagan Scepter"`;
+
+      for (let i = 0; i < csvData.length; i++) {
+        * data[i][1] : to skip undefined or null values
+        * .toLowerCase() to make comparisons case-insensitive
+        * .includes to check if one string is contained within another
+        if (csvData[i][10] && csvData[i][gearVar.SingItemName].toLowerCase().includes(itemName.toLowerCase())) {
+          itemData.push({ 
+            dataInfo : {
+              itemId : csvData[i][0],
+              row: i,
+            },
+            "singularName" : csvData[i][gearVar.SingItemName],
+          });
+        }
+      }
+
+      console.log(`${itemName} info :`, itemData);
+    
+    */
+    
+    
+    /*
+    searchbar addeventlistener ('input', () => {
+      
+      if ( input !== emptiness (?) ){
+
+        filteredDataSearch = filter and everything so only names that are related to what was written on input will be displayed
+
+        loadMoreSearchedItems()
+        
+        if (filteredDataSearch.length === 0) {
+          searchResults.innerHTML = `nothing to see here :)`
+        }
+
+      }
+     
+    })
+    */
+
   });
+  
+  // console.log('fullNames : ', fullNames);
 
   function loadMoreItems() {
     const itemsToLoad = filteredData.slice(currentIndex, currentIndex + itemsPerBatch);
+    console.log(itemsToLoad);
     itemsToLoad.forEach(item => {
 
       // console.log(item);
+      // console.log(`item[44] : ${item[gearVar.jobReq]}, ${typeof(item[gearVar.jobReq])}`);
 
       searchResults.innerHTML += `
         <div class="item" data-itemid="${item[gearVar.itemId]}" data-geartype="${item[gearVar.equipSlot]}">
           <div data-iconId="${iconFunction(item[gearVar.icons])}">
-            <img src="https://xivapi.com/i/${iconFunction(item[gearVar.icons])}.png" alt="">
+            <img src="https://xivapi.com/i/${iconFunction(item[gearVar.icons], 0)}.png" alt="">
           </div>
           <div>
             <span>${item[gearVar.SingItemName]}</span>
             <span>lvl ${item[gearVar.levelReq]}, Ilvl ${item[gearVar.itemLevel]}</span>
             <div class="bonuses">
-              <span>class name here : ${item[44]}</span>
+              <span>${nbrToNames(item[gearVar.jobReq])}</span>
               <hr>
               <div class="stats">
                 <p><span>dexterity</span> +98</p>
@@ -465,6 +520,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     currentIndex += itemsPerBatch;
     observeLastItem();
+  }
+
+  // todo : take as param classJobCategory -> look through numberToName.json if exist as proprety -> then takes its value
+  //* ex for "47" should return "lnc, DRG"
+  // -> [gpt] default Value in Signature: This approach is cleaner and reduces the amount of code. It automatically sets index to 0 if it is not provided when calling the function. 
+  //* this approach is prefered for it simplicity but can use inside : if (index === undefined){index = 0;}, same thing
+  function nbrToNames(number, index = 0) {
+    // console.log(`number : ${number}, ${typeof(number)}`);
+    
+    const key = String(number)
+
+    console.log(fullNames);
+
+    const result = fullNames[index][key]
+    // console.log(`result : ${result}`);
+    
+    return result || 'Number not found';
+
   }
 
   //! Equiping Gear
@@ -495,6 +568,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   })
 
+  //! (idea wip) On Search
+
+  /*
+  function loadMoreSearchedItems() {
+    const searchedItemsToLoad = filteredDataSearch.slice(currentIndex, currentIndex + itemsPerBatch);
+    console.log(searchedItemsToLoad);
+    searchedItemsToLoad.forEach(item => {
+
+      searchResults.innerHTML += `...`;
+    });
+    currentIndex += itemsPerBatch;
+    observeLastItem();
+  }
+  */
+
   // - Functions to observe the last item in searchResults so when it comes close to viewport 
   //* -> will lauch loadMoreItems() and add 20 more items in searchResults
   //* reduced waiting time from ~10s to ~4s with that (async functions etc, but mainly that I think) 
@@ -519,28 +607,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 fetchData()
 
-//! =-=-=| On Search |=-=-= 
-// todo : link itemName with a search bar (addEventListener)
-// todo : add condition that if contains a part of the full gear name, will show every gear that contains that part of the word
-// const itemName = `"Drachen Armet"`;
-// for (let i = 0; i < csvData.length; i++) {
-//   //* data[i][1] : to skip undefined or null values
-//   //* .toLowerCase() to make comparisons case-insensitive
-//   //* .includes to check if one string is contained within another
-//   if (csvData[i][10] && csvData[i][gearVar.SingItemName].toLowerCase().includes(itemName.toLowerCase())) {
-//     itemData.push({ 
-//       dataInfo : {
-//         itemId : csvData[i][0],
-//         row: i,
-//       },
-//       "singularName" : csvData[i][gearVar.SingItemName],
-      
-//       //! Stats here ?
 
-//     });
-//   }
-// }
-// console.log(`${itemName} info :`, itemData);
 
 
 //! Style Js (open/closing popups, etc)

@@ -43,6 +43,20 @@
       "68"	: "acn, SMN SCH",
       "102"	: "pgl rog, MNK NIN SAM",
       "105"	: "arc rog, BRD NIN MCH DNC"
+    },
+    {
+      "1" : "Main Weapon",
+      "2" : "Shield",
+      "3" : "Head",
+      "4" : "Body",
+      "5" : "Hands",
+      "7" : "Legs",
+      "8" : "Feet",
+      "9" : "Earrings",
+      "10" : "Necklace",
+      "11" : "Bracelets",
+      "12" : "Ring",
+      "13" : "Main Weapon"
     }
   ]
 }
