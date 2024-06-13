@@ -57,6 +57,20 @@
       "11" : "Bracelets",
       "12" : "Ring",
       "13" : "Main Weapon"
+    },
+    {
+      "1" : "strength",
+      "2" : "dexterity",
+      "3" : "vitality",
+      "4" : "intelligence",
+      "5" : "mind",
+      "6" : "piety",
+      "22" : "direct hit rate",
+      "27" : "critical hit",
+      "44" : "determination",
+      "45" : "skill speed",
+      "46" : "spell speed",
+      "19" : "tenacity"
     }
   ]
 }

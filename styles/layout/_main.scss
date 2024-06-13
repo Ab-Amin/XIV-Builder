@@ -269,12 +269,18 @@
   
             .search{
               direction:ltr;
+              position: relative;
   
               > div:first-of-type{
+                position: sticky;
+                top: 0;
+                left: 0;
+
                 margin-top: 30px;
                 display: flex;
                 flex-direction: row;
                 justify-content: stretch;
+
                 input, button{
                   padding: 8px;
                   border: none;
@@ -336,7 +342,7 @@
                     // lvl
                     >span:nth-of-type(2){
                       font-size: 12px;
-                      color: #eeeeee;
+                      color: #eee;
                     }
   
                     .bonuses{
@@ -354,13 +360,18 @@
                       .stats{
                         display: grid;
                         grid-template-columns: repeat(2, 1fr);
+                        text-transform: capitalize;
+
                         p{
                           margin: 0;
                           white-space: nowrap;
                           font-size: 14px;
                           color: rgb(241, 241, 241);
-                          span{
+                          span:first-of-type{
                             color: #ac9c83;
+                          }
+                          span:last-of-type{
+                            color: #f1f1f1;
                           }
   
                         }

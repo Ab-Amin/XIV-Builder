@@ -62,6 +62,70 @@ let choosenJob = [];
 
 let searchedGear = [];
 
+
+
+
+//! =-=-=|> ToDo Notes : (with 'better Comments' plugin on vsCode)
+/* 
+  ! For Pc Version (last)
+  todo : (idea) quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
+  todo : (idea) quand cloque off le search window, enlever toutes les classe draggeable
+
+  ! --> Job Selector + Saving
+  // todo : take job selected into profile 
+  // todo : job selector popup when clicking on job-stone too
+  todo : give warning if didn't save, will lose previous 'build' if no -> empty build, if yes -> save + change job
+  todo : redo first fetch to display diff jobs and fuse with build save
+  todo : add way to store job chosen, id of gear equiped (as an object in list ?) 
+
+
+  ! --> On Search
+  todo : link itemName with a search bar (addEventListener)
+  todo : able to search for gear name on search bar (even if only writting half the name)
+  
+  ! --> Gear to Display
+  // todo : sort by equip slot category (if excel[18] == 1/2/3/4/... { => main/off hand,head,body,... })
+  // todo : condition #1 : get job taken and add it as a condition for gears to appear
+  // todo : condition #2 : get data-geartype
+  // todo : display every gear that the job can equip, not only the specified one
+  // todo ↑ for example : if job is PLD(20) find a way to also have the gear that have PLD in their value (like gla, PLD) to display too
+  // todo : if job is paladin, switch equipslot from main hand (13) to main hand (1)
+  // todo : translate icon codes into images with xiv icon api
+  todo [shortened from ~10s to ~4s] : optimisation (don't display all items at once, only when is about to enter(scroll) the viewport add more item) 
+  todo : add a loading while waiting for item to appear
+  todo : if scrolling to the point of not seeing search bar => arrow 'back to top' apprears
+  todo : ability to remove gear
+
+  ! --> (test) to get accessories gear to appear on search window 
+  // todo : Need to get the shortname of job with the number (should do with firstJsonData) 
+  // todo : Then take the shortname and search through secondJsonData all the number that contains that shortname (ex : 23 -> DRG; 47 -> lnc, DRG)
+  // todo : Return those number and innerHTML in clicked accessory gear all of the gear
+  
+  ! --> Gear Stats
+  todo : translate numbers to name and asign them to the right stats ... (BaseParam[0,1,2,3] -> BaseParamValue[0,1,2,3])
+    -  [62] -> "BlockRate",
+    -  [63] -> "Block",
+    -  [64] -> "Defense{Phys}",
+    -  [65] -> "Defense{Mag}",
+    -  [66] -> "BaseParam[0]",
+    -  [67] -> "BaseParamValue[0]",
+    -  [68] -> "BaseParam[1]",
+    -  [69] -> "BaseParamValue[1]",
+    -  [70] -> "BaseParam[2]",
+    -  [71] -> "BaseParamValue[2]",
+    -  [72] -> "BaseParam[3]",
+    -  [73] -> "BaseParamValue[3]",
+    x  74 = "BaseParam[4]",
+    x  75 = "BaseParamValue[4]",
+    x  76 = "BaseParam[5]",
+    x  77 = "BaseParamValue[5]"
+
+  ! Useful Stuff
+  // // todo : take as param classJobCategory -> look through numberToName.json if exist as proprety -> then takes its value
+
+  
+*/
+
 //! =-=-=-=-=| my .json file |=-=-=-=-=
 
 fetch("info.json")
@@ -135,7 +199,7 @@ fetch("info.json")
   }
 
   //! Job Selector
-  //? GPT : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
+  //? [GPT] : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
   //? --> flatMap(...)
 
   //! Function that give info from my info.json based on CSVcode
@@ -204,78 +268,6 @@ fetch("info.json")
 .catch(error => {console.log("Erreur lors de la récup des données :", error)})
 
 
-
-//! =-=-=|> ToDo Notes : (with 'better Comments' plugin on vsCode)
-/* 
-  ! For Pc Version (last)
-  todo : (idea) quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
-  todo : (idea) quand cloque off le search window, enlever toutes les classe draggeable
-
-  ! --> Job Selector + Saving
-  // todo : take job selected into profile 
-  // todo : job selector popup when clicking on job-stone too
-  todo : give warning if didn't save, will lose previous 'build' if no -> empty build, if yes -> save + change job
-  todo : redo first fetch to display diff jobs and fuse with build save
-
-  ! --> On Search
-  todo : link itemName with a search bar (addEventListener)
-  todo : able to search for gear name on search bar (even if only writting half the name)
-  
-  ! --> Gear to Display
-  // todo : sort by equip slot category (if excel[18] == 1/2/3/4/... { => main/off hand,head,body,... })
-  // todo : condition #1 : get job taken and add it as a condition for gears to appear
-  // todo : condition #2 : get data-geartype
-  // todo : display every gear that the job can equip, not only the specified one
-  // todo ↑ for example : if job is PLD(20) find a way to also have the gear that have PLD in their value (like gla, PLD) to display too
-  // todo : if job is paladin, switch equipslot from main hand (13) to main hand (1)
-  // todo : translate icon codes into images with xiv icon api
-  todo [shortened from ~10s to ~4s] : optimisation (don't display all items at once, only when is about to enter(scroll) the viewport add more item) 
-  todo : add a loading while waiting for item to appear
-  todo : if scrolling to the point of not seeing search bar => arrow 'back to top' apprears
-  todo : ability to remove gear
-
-  ! --> (test) to get accessories gear to appear on search window 
-  // todo : Need to get the shortname of job with the number (should do with firstJsonData) 
-  // todo : Then take the shortname and search through secondJsonData all the number that contains that shortname (ex : 23 -> DRG; 47 -> lnc, DRG)
-  // todo : Return those number and innerHTML in clicked accessory gear all of the gear
-  
-  ! --> Gear Stats
-  todo : find way to translate numbers to name and asign them to the right stats ... (BaseParam[0,1,2,3] -> BaseParamValue[0,1,2,3])
-    -  [62] -> "BlockRate",
-    -  [63] -> "Block",
-    -  [64] -> "Defense{Phys}",
-    -  [65] -> "Defense{Mag}",
-    -  [66] -> "BaseParam[0]",
-    -  [67] -> "BaseParamValue[0]",
-    -  [68] -> "BaseParam[1]",
-    -  [69] -> "BaseParamValue[1]",
-    -  [70] -> "BaseParam[2]",
-    -  [71] -> "BaseParamValue[2]",
-    -  [72] -> "BaseParam[3]",
-    -  [73] -> "BaseParamValue[3]",
-    x  74 = "BaseParam[4]",
-    x  75 = "BaseParamValue[4]",
-    x  76 = "BaseParam[5]",
-    x  77 = "BaseParamValue[5]" 
-
-    * Add to NumberToName.json ?
-    - BaseParam[0, 1, 2, 3] (don't do 4 & 5 yet)
-    - "1" = strength
-    - "2" = dexterity
-    - "3" = vitality
-    - "4" = intelligence
-    - "5" = mind
-    - "6" = piety
-    - "22" = direct hit rate
-    - "27" = critical hit
-    - "44" = determination
-    - "45" = skill speed
-    - "46" = spell speed
-    - "184" = tenacity
-
-  
-*/
-
 //! On Job Change
 // todo : redo first fetch to display diff jobs and fuse with build save
 function onJobChange() {
@@ -290,16 +282,15 @@ function onJobChange() {
 }
 
 function startLoading() {
-  console.log('Loading --> dsiplay block');
+  console.log('Loading --> Start');
   document.getElementById('loading').style.display = 'block';
   document.getElementById('loading').offsetHeight; // - Trigger a reflow, flushing the CSS changes
 }
-
 function stopLoading() {
-  console.log('Loading --> dsiplay none');
+  console.log('Loading --> Stop');
   document.getElementById('loading').style.display = 'none';
-
 }
+
 
 //! Fetch and Main JavaScript
 async function fetchData() {
@@ -343,6 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentIndex = 0;
   const itemsPerBatch = 20;
 
+
   //! Getting All Number The Chosen Job Is A Part Of
   //* fullJobNbrList() -> Function that will return array of string number related to choosen job 
   //* (ex for 23 (aka DRG) --> ["23", "47", "84", "76"] (aka ["DRG", "lnc, DRG", "pgl lnc, MNK DRG SAM RPR", "lnc, DRG RPR"])
@@ -383,6 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     //* findNumbersWithshortname( secondJsonData.numToName[0] --> findJobShortname( findJobShortname( Job ) ) )
     return findNumbersWithshortname(numToName);
   }
+
 
   //! Item Icons (from XIVAPI) 
   //* link to icon is : https://xivapi.com/i/[folder_id]/[icon_id].png
@@ -470,21 +463,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           stopLoading()
         }, 1);
       }
-      
     }
+    removeParentIfZero() //* remove the parent of stats that are +0 (because useless :)
+
 
     //! (wip idea) On Search 
     // todo : link itemName with a search bar (addEventListener)
     // todo : add condition that if contains a part of the full gear name, will show every gear that contains that part of the word
-    /*
-      - brouillon
+    
+      // - brouillon
 
-      const itemName = `"Allagan Scepter"`;
+      const itemName = `"Inferno Battleaxe"`;
 
       for (let i = 0; i < csvData.length; i++) {
-        * data[i][1] : to skip undefined or null values
-        * .toLowerCase() to make comparisons case-insensitive
-        * .includes to check if one string is contained within another
+        //* data[i][1] : to skip undefined or null values
+        //* .toLowerCase() to make comparisons case-insensitive
+        //* .includes to check if one string is contained within another
         if (csvData[i][10] && csvData[i][gearVar.SingItemName].toLowerCase().includes(itemName.toLowerCase())) {
           itemData.push({ 
             dataInfo : {
@@ -493,14 +487,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             "singularName" : csvData[i][gearVar.SingItemName],
           });
+          console.log(csvData[i]);
         }
       }
 
       console.log(`${itemName} info :`, itemData);
     
-    */
-    
-    
+
     /*
     searchbar addeventlistener ('input', () => {
       
@@ -541,13 +534,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span>${item[gearVar.SingItemName]}</span>
             <span>lvl ${item[gearVar.levelReq]}, Ilvl ${item[gearVar.itemLevel]}</span>
             <div class="bonuses">
-              <span>${nbrToNames(item[gearVar.jobReq])}</span>
+              <span>${nbrToNames(item[gearVar.jobReq], 0)}</span>
               <hr>
               <div class="stats">
-                <p><span>dexterity</span> +98</p>
-                <p><span>critical hit</span> +96</p>
-                <p><span>vitality</span> +103</p>
-                <p><span>determination</span> +67</p>
+                <p>
+                  <span>${nbrToNames(item[gearVar.gearStatName0], 2)? nbrToNames(item[gearVar.gearStatName0], 2) : 'Nan'}</span> 
+                  +<span class="item-stats">${item[gearVar.gearStat0]}</span>
+                </p>
+                <p>
+                  <span>${nbrToNames(item[gearVar.gearStatName1], 2)}</span> 
+                  +<span class="item-stats">${item[gearVar.gearStat1]}</span>
+                </p>
+                <p>
+
+                  <span>${nbrToNames(item[gearVar.gearStatName2], 2)}</span> 
+                  +<span class="item-stats">${item[gearVar.gearStat2]}</span>
+                </p>
+                <p>
+                  <span>${nbrToNames(item[gearVar.gearStatName3], 2)}</span> 
+                  +<span class="item-stats">${item[gearVar.gearStat3] }</span>
+                </p>
               </div>
             </div>
           </div>
@@ -555,16 +561,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
 
     });
+    
     currentIndex += itemsPerBatch;
+    removeParentIfZero()
     observeLastItem();
-
   }
 
-  // todo : take as param classJobCategory -> look through numberToName.json if exist as proprety -> then takes its value
-  //* ex for "47" should return "lnc, DRG"
-  // -> [gpt] default Value in Signature: This approach is cleaner and reduces the amount of code. It automatically sets index to 0 if it is not provided when calling the function. 
-  //* this approach is prefered for it simplicity but can use inside : if (index === undefined){index = 0;}, same thing
+
+  //! From "Number Naming" to "Full Name"
+  //* return value based on number from numberToName.json
   function nbrToNames(number, index = 0) {
+    // -> [GPT] default Value in Signature: This approach is cleaner and reduces the amount of code. It automatically sets index to 0 if it is not provided when calling the function. 
+    //* this approach is prefered for it simplicity but can use inside : if (index === undefined){index = 0;}, same thing
     // console.log(`number : ${number}, ${typeof(number)}`);
     
     const key = String(number)
@@ -574,9 +582,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const result = fullNames[index][key]
     // console.log(`result : ${result}`);
     
-    return result || 'Number not found';
+    return result || undefined;
 
   }
+
+
+  //! Remove parentt of useless displayed stat (if stat = 0)
+  function removeParentIfZero(stat) {
+    const elements = document.querySelectorAll('.item-stats');
+  
+    elements.forEach(element => {
+      const statValue = parseInt(element.textContent, 10); // Assuming the stat value is the text content of the element
+      if (statValue === 0) {
+        element.parentElement.remove();
+      }
+    });
+  }
+
 
   //! Equiping Gear
   searchResults.addEventListener('click', e => {
@@ -594,7 +616,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
     
-      console.log(`Item Id : ${dataItemId} | Gear Slot : ${dataGearSlot} | Icon Id : ${dataIconId}`);
+      console.log(`You equiped Id:${dataItemId} on ${nbrToNames(dataGearSlot, 1)}.`);
       closeGearWindow()
   
       if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
@@ -606,6 +628,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   })
 
+  
   //! (idea wip) On Search
 
   /*
@@ -621,7 +644,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   */
 
-  // - Functions to observe the last item in searchResults so when it comes close to viewport 
+
+  //! Observer Last Item + Load More Items
+  //? Functions to observe the last item in searchResults so when it comes close to viewport 
   //* -> will lauch loadMoreItems() and add 20 more items in searchResults
   //* reduced waiting time from ~10s to ~4s with that (async functions etc, but mainly that I think) 
   function observeLastItem() {
@@ -632,22 +657,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   const observer = new IntersectionObserver((entries) => {
-    // - Each entry represents an observed element (last item in this case) so use 'entries[0]' (?)
-    // - is entries[0].isIntersecting = true, means that last item has come to vue -> so loadMoreItems()
+    //? Each entry represents an observed element (last item in this case) so use 'entries[0]' (?)
+    //* is entries[0].isIntersecting = true, means that last item has come to vue -> so loadMoreItems()
     if (entries[0].isIntersecting) {
       loadMoreItems();
     }
   }, { rootMargin: '0px 0px 200px 0px' });
-  //* option 'rootMargin' adds a margin to observer so it doesn't wait to exactly come into view of last item
+  //? option 'rootMargin' adds a margin to observer so it doesn't wait to exactly come into view of last item
   //* -> will load more item a bit before actually reaching the end (more 'fluid' when scrolling at the end)
 
   stopLoading()
 })
-
-
 fetchData()
-
-
 
 
 //! Style Js (open/closing popups, etc)
@@ -668,7 +689,8 @@ function closeJobSelector() {
   jobSelectorBG.classList.add('hidden');
 }
 
-//* closing popup when clicking outside of it
+
+//! Closing Window When 'Click' Outside Of It
 function outsideClickClose(windowName, closingWingowButton) {
   document.addEventListener('click', function(e) {
 
@@ -691,14 +713,11 @@ gearGrid.addEventListener('click', e => {
     //? Stops event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();
     openGearWindow()
-
   }
 })
 outsideClickClose(gearWindow, gearWindowX)
 gearWindowX.addEventListener('click', closeGearWindow)
 
-//* open job selector when click on profile 'job'
-// // todo : add way to store name of job clicked before it closes
 profile.addEventListener('click', e => {
   // // todo : if clicked on a 'job' => takes name of job and then closes
 
@@ -710,7 +729,6 @@ profile.addEventListener('click', e => {
 outsideClickClose(jobSelectorBG, jobSelectorX)
 jobSelectorX.addEventListener('click', closeJobSelector)
 
-// * open job selector when click on gear 'job-stone'
 document.querySelector('.job-save').addEventListener('click', e => {
 
   if (e.target.tagName === 'IMG') {
