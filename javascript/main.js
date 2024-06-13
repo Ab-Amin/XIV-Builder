@@ -58,7 +58,7 @@ const searchResults = document.querySelector('.search-results');
 
 //! =-=-=-=-=| lists |=-=-=-=-=
 let itemData = [];
-let choosenJob = [];
+let equipedGearIds = [];
 
 let searchedGear = [];
 
@@ -102,23 +102,9 @@ let searchedGear = [];
   // todo : Return those number and innerHTML in clicked accessory gear all of the gear
   
   ! --> Gear Stats
-  todo : translate numbers to name and asign them to the right stats ... (BaseParam[0,1,2,3] -> BaseParamValue[0,1,2,3])
-    -  [62] -> "BlockRate",
-    -  [63] -> "Block",
-    -  [64] -> "Defense{Phys}",
-    -  [65] -> "Defense{Mag}",
-    -  [66] -> "BaseParam[0]",
-    -  [67] -> "BaseParamValue[0]",
-    -  [68] -> "BaseParam[1]",
-    -  [69] -> "BaseParamValue[1]",
-    -  [70] -> "BaseParam[2]",
-    -  [71] -> "BaseParamValue[2]",
-    -  [72] -> "BaseParam[3]",
-    -  [73] -> "BaseParamValue[3]",
-    x  74 = "BaseParam[4]",
-    x  75 = "BaseParamValue[4]",
-    x  76 = "BaseParam[5]",
-    x  77 = "BaseParamValue[5]"
+  todo : translate numbers to name and asign them to the right stats with respecctive stats 
+  * name : BaseParam[0, 1, 2 & 3], stats number : BaseParamValue[0, 1, 2 & 3] 
+  * (not 4 & 5, haven't figured out their use yet...)
 
   ! Useful Stuff
   // // todo : take as param classJobCategory -> look through numberToName.json if exist as proprety -> then takes its value
@@ -237,14 +223,6 @@ fetch("info.json")
       const jobInfo = findJobByCSVcode(Number(datajob));
 
       console.log(`You choose ${jobInfo.shortname} (${datajob})`);
-
-      if (Number(datajob)) {
-        choosenJob.push({
-          "choosenjob" : datajob,
-        });
-      }
-
-      // console.log(jobIcon);
 
       document.querySelector('.profile-job').innerHTML= `
       <div
@@ -571,28 +549,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   //! From "Number Naming" to "Full Name"
   //* return value based on number from numberToName.json
   function nbrToNames(number, index = 0) {
-    // -> [GPT] default Value in Signature: This approach is cleaner and reduces the amount of code. It automatically sets index to 0 if it is not provided when calling the function. 
-    //* this approach is prefered for it simplicity but can use inside : if (index === undefined){index = 0;}, same thing
+    // -> [GPT] for 'index = 0' : default Value in Signature: This approach is cleaner and reduces the amount of code. It automatically sets index to 0 if it is not provided when calling the function. 
+    //* this approach is prefered for it simplicity but can use ' if (index === undefined){index = 0;} ', same thing
     // console.log(`number : ${number}, ${typeof(number)}`);
     
     const key = String(number)
-
-    console.log(fullNames);
 
     const result = fullNames[index][key]
     // console.log(`result : ${result}`);
     
     return result || undefined;
-
   }
 
 
-  //! Remove parentt of useless displayed stat (if stat = 0)
-  function removeParentIfZero(stat) {
+  //! Remove parent of useless displayed stat (if stat = 0)
+  function removeParentIfZero() {
     const elements = document.querySelectorAll('.item-stats');
   
     elements.forEach(element => {
-      const statValue = parseInt(element.textContent, 10); // Assuming the stat value is the text content of the element
+      const statValue = parseInt(element.textContent); // Assuming the stat value is the text content of the element
       if (statValue === 0) {
         element.parentElement.remove();
       }
@@ -624,10 +599,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-itemid="${dataItemId}" title="Item Name here">
         `
       }
-  
-    }
+    }    
   })
 
+  // equipedGearIds -> list with all equiped id
+
+  //! Calculate Full Stats and Display On 
+  function handleNewImg(imgElement) {
+    const dataId = imgElement.getAttribute('data-id');
+
+    if (dataId && !equipedGearIds.includes(dataId)) {
+      equipedGearIds.push(dataId);
+
+      console.log(`New data-id found: ${dataId}`);
+      console.log('Current data-ids:', equipedGearIds);
+    }
+  }
   
   //! (idea wip) On Search
 
