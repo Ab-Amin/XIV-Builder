@@ -52,15 +52,15 @@ const jobSelectorBG = document.querySelector('.dark-bg')
 const jobSelectorX = document.querySelector('.job-selector--x')
 
 const gearGrid = document.querySelector('.gear-grid')
+const gearBoxes = document.querySelectorAll('.gear-box')
 const gearWindow = document.querySelector('.search-window')
 const gearWindowX = document.querySelector('.search-window--x')
 const searchResults = document.querySelector('.search-results');
 
 //! =-=-=-=-=| lists |=-=-=-=-=
 let itemData = [];
-let equipedGearIds = [];
-
-let searchedGear = [];
+let equippedGear = [];
+let equippedGearIds = [];
 
 
 
@@ -74,9 +74,10 @@ let searchedGear = [];
   ! --> Job Selector + Saving
   // todo : take job selected into profile 
   // todo : job selector popup when clicking on job-stone too
-  todo : give warning if didn't save, will lose previous 'build' if no -> empty build, if yes -> save + change job
+  // todo : add list and store job, id of gear equiped and on which gear type 
   todo : redo first fetch to display diff jobs and fuse with build save
-  todo : add way to store job chosen, id of gear equiped (as an object in list ?) 
+  todo : give warning if didn't save, will lose previous 'build' if no -> empty build, if yes -> save + change job
+  todo : add condition to have something equiped on every slot before saving ( list.length === 11 (- shield))
 
 
   ! --> On Search
@@ -102,7 +103,7 @@ let searchedGear = [];
   // todo : Return those number and innerHTML in clicked accessory gear all of the gear
   
   ! --> Gear Stats
-  todo : translate numbers to name and asign them to the right stats with respecctive stats 
+  // todo : translate numbers to name and asign them to the right stats 
   * name : BaseParam[0, 1, 2 & 3], stats number : BaseParamValue[0, 1, 2 & 3] 
   * (not 4 & 5, haven't figured out their use yet...)
 
@@ -184,12 +185,12 @@ fetch("info.json")
     `
   }
 
-  //! Job Selector
-  //? [GPT] : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
-  //? --> flatMap(...)
+  //! Job Selector =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-  //! Function that give info from my info.json based on CSVcode
+  //! Function that give info from info.json based on CSVcode
   function findJobByCSVcode(code) {
+    //? [GPT] : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
+    //? --> flatMap(...)
     //- Flatten the arrays inside jobInfo
     const allJobs = data.jobInfo.flatMap(category => {
       //- Flatten each category's job array
@@ -213,6 +214,14 @@ fetch("info.json")
     }
   }
 
+  //! Empty the gear boxes in case allready equiped something in previous chosen job
+  function emptyGearBox() {
+    gearBoxes.forEach(gearBox => {
+      gearBox.innerHTML = ''
+    });
+    console.log('equipement emptied...');
+  }
+
   //* When selection job --> will change profile + stone and short job name
   jobSelector.addEventListener('click', e => {
 
@@ -223,6 +232,8 @@ fetch("info.json")
       const jobInfo = findJobByCSVcode(Number(datajob));
 
       console.log(`You choose ${jobInfo.shortname} (${datajob})`);
+
+      emptyGearBox()
 
       document.querySelector('.profile-job').innerHTML= `
       <div
@@ -246,18 +257,7 @@ fetch("info.json")
 .catch(error => {console.log("Erreur lors de la récup des données :", error)})
 
 
-//! On Job Change
-// todo : redo first fetch to display diff jobs and fuse with build save
-function onJobChange() {
-  // too lazy for now 
-  //-> if changes Job 
-  //  -> offer to save current set (window with warning 'gear will del, do you want to save ? y/n)
-  //    -> if (yes) 
-  //      -> save (how ? idk yet ¯\_(ツ)_/¯, should learn firebase maybe)
-  //    -> if (no)
-  //      -> empty current equiped gear
-  //      -> and equip the new job selected
-}
+
 
 function startLoading() {
   console.log('Loading --> Start');
@@ -270,7 +270,7 @@ function stopLoading() {
 }
 
 
-//! Fetch and Main JavaScript
+//! Fetch and Main JavaScript =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 async function fetchData() {
   try {
     startLoading()
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const itemsPerBatch = 20;
 
 
-  //! Getting All Number The Chosen Job Is A Part Of
+  //! Getting All Number The Chosen Job Is A Part Of =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   //* fullJobNbrList() -> Function that will return array of string number related to choosen job 
   //* (ex for 23 (aka DRG) --> ["23", "47", "84", "76"] (aka ["DRG", "lnc, DRG", "pgl lnc, MNK DRG SAM RPR", "lnc, DRG RPR"])
   function fullJobNbrList() { 
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  //! Item Icons (from XIVAPI) 
+  //! Item Icons (from XIVAPI) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   //* link to icon is : https://xivapi.com/i/[folder_id]/[icon_id].png
   function iconFunction(iconNbr) {
     let icon_id = iconNbr
@@ -445,31 +445,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     removeParentIfZero() //* remove the parent of stats that are +0 (because useless :)
 
 
-    //! (wip idea) On Search 
+    //! (wip idea) On Search =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     // todo : link itemName with a search bar (addEventListener)
     // todo : add condition that if contains a part of the full gear name, will show every gear that contains that part of the word
     
       // - brouillon
 
-      const itemName = `"Inferno Battleaxe"`;
+      // const itemName = `"Inferno Battleaxe"`;
 
-      for (let i = 0; i < csvData.length; i++) {
-        //* data[i][1] : to skip undefined or null values
-        //* .toLowerCase() to make comparisons case-insensitive
-        //* .includes to check if one string is contained within another
-        if (csvData[i][10] && csvData[i][gearVar.SingItemName].toLowerCase().includes(itemName.toLowerCase())) {
-          itemData.push({ 
-            dataInfo : {
-              itemId : csvData[i][0],
-              row: i,
-            },
-            "singularName" : csvData[i][gearVar.SingItemName],
-          });
-          console.log(csvData[i]);
-        }
-      }
+      // for (let i = 0; i < csvData.length; i++) {
+      //   //* data[i][1] : to skip undefined or null values
+      //   //* .toLowerCase() to make comparisons case-insensitive
+      //   //* .includes to check if one string is contained within another
+      //   if (csvData[i][10] && csvData[i][gearVar.SingItemName].toLowerCase().includes(itemName.toLowerCase())) {
+      //     itemData.push({ 
+      //       dataInfo : {
+      //         itemId : csvData[i][0],
+      //         row: i,
+      //       },
+      //       "singularName" : csvData[i][gearVar.SingItemName],
+      //     });
+      //     console.log(csvData[i]);
+      //   }
+      // }
 
-      console.log(`${itemName} info :`, itemData);
+      // console.log(`${itemName} info :`, itemData);
     
 
     /*
@@ -516,7 +516,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <hr>
               <div class="stats">
                 <p>
-                  <span>${nbrToNames(item[gearVar.gearStatName0], 2)? nbrToNames(item[gearVar.gearStatName0], 2) : 'Nan'}</span> 
+                  <span>${nbrToNames(item[gearVar.gearStatName0], 2)}</span> 
                   +<span class="item-stats">${item[gearVar.gearStat0]}</span>
                 </p>
                 <p>
@@ -536,7 +536,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           </div>
         </div>
-      `;
+      `;     
 
     });
     
@@ -546,8 +546,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  //! From "Number Naming" to "Full Name"
-  //* return value based on number from numberToName.json
+  //! From "Number Naming" to "Full Name" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   function nbrToNames(number, index = 0) {
     // -> [GPT] for 'index = 0' : default Value in Signature: This approach is cleaner and reduces the amount of code. It automatically sets index to 0 if it is not provided when calling the function. 
     //* this approach is prefered for it simplicity but can use ' if (index === undefined){index = 0;} ', same thing
@@ -562,7 +561,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  //! Remove parent of useless displayed stat (if stat = 0)
+  //! Remove parent of useless displayed stat (if stat = 0) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   function removeParentIfZero() {
     const elements = document.querySelectorAll('.item-stats');
   
@@ -575,48 +574,166 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  //! Equiping Gear
+  //! Equiping Gear + save (kinda) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   searchResults.addEventListener('click', e => {
 
     if (e.target.classList.contains('item') || e.target.closest('.item')){
     
-      let dataItemId = e.target.closest('.item').getAttribute('data-itemid')
-      let dataGearSlot = e.target.closest('.item').getAttribute('data-geartype')
-      let dataIconId = e.target.closest('.item').firstElementChild.getAttribute('data-iconId')
-      let nameOfItem;
+      const dataItemId = e.target.closest('.item').getAttribute('data-itemid')
+      const dataGearSlot = e.target.closest('.item').getAttribute('data-geartype')
+      const dataIconId = e.target.closest('.item').firstElementChild.getAttribute('data-iconId')
+      const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
     
       for (let i = 0; i < csvData.length; i++) {
         if ( Number(csvData[i][gearVar.itemId]) === Number(dataItemId) ) {
           console.log(csvData[i]);
         }
       }
-    
-      console.log(`You equiped Id:${dataItemId} on ${nbrToNames(dataGearSlot, 1)}.`);
+
+      console.log('Saving ...');
+      equipGear(Job, dataGearSlot, dataItemId)
+
       closeGearWindow()
   
       if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
         gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
-          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-itemid="${dataItemId}" title="Item Name here">
+          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="Item Name here">
         `
+
+        const gearRow = csvData.find(row => row[0] === dataItemId);
+        console.log(`Gear Id#${dataItemId} Stats ***********************`);
+        console.log(`${nbrToNames(gearRow[66], 2)} => +${gearRow[67]}`);
+        console.log(`${nbrToNames(gearRow[68], 2)} => +${gearRow[69]}`);
+        console.log(`${nbrToNames(gearRow[70], 2)} => +${gearRow[71]}`);
+        console.log(`${nbrToNames(gearRow[72], 2)} => +${gearRow[73]}`);
+        console.log('*******************************************');
+
+        //! get all stats for window-stats
+        onGearEquipped()
       }
-    }    
-  })
-
-  // equipedGearIds -> list with all equiped id
-
-  //! Calculate Full Stats and Display On 
-  function handleNewImg(imgElement) {
-    const dataId = imgElement.getAttribute('data-id');
-
-    if (dataId && !equipedGearIds.includes(dataId)) {
-      equipedGearIds.push(dataId);
-
-      console.log(`New data-id found: ${dataId}`);
-      console.log('Current data-ids:', equipedGearIds);
     }
+  })
+  
+  //! "Save" Gear Equiped =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  function equipGear(job, gearSlot, gearId) {
+    console.log(`job : ${job}, ${typeof(job)} | gearSlot : ${gearSlot}, ${typeof(gearSlot)} | gearId : ${gearId}, ${typeof(gearId)}`);
+
+    //* Find the currently equiped job in equippedGear[]
+    let jobEntry = equippedGear.find(elem => elem[job]);
+  
+    //* If currently equiped job does not exist -> create it
+    if (!jobEntry) {
+      jobEntry = { [job]: {} };
+      equippedGear.push(jobEntry);
+    }
+  
+    //* Equip gear in the specified slot for the job (or replaces it)
+    jobEntry[job][gearSlot] = { gearId };
+  
+    console.log(`Equipped ${gearId} in slot ${gearSlot} for job ${job}`);
+    console.log('Current equippedGear:', equippedGear);
+  }
+
+
+  //! Full Stats Display =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+  //* Get Equipped Gear IDs
+  function getEquippedGearIds() {
+    const gearBoxes = document.querySelectorAll('.gear-box img[data-id]');
+    //* Create a list of all equiped Ids so can use them later to get their stats and display on stats-window
+    return Array.from(gearBoxes).map(img => img.getAttribute('data-id'));
+  }
+
+
+  //! Gets the stats for a given gear ID
+  function getGearStats(gearId) {
+
+    //* Find the row in the CSV data that match the gear ID
+    const gearRow = csvData.find(row => row[0] === gearId);
+    // if (!gearRow) return null;
+
+    let regex = /["\\]/g; //* regex 'cause i just learned about them :)
+    const gearName = gearRow[10].replace(regex, '')
+
+    //* Create a stats object with stats name & their value
+    const stats = {};
+    //* from 66 to 72 by +2 jumps because stats name are 66, 68, 70 and 72 
+    for (let i = 66; i <= 72; i += 2) {
+      const statName = nbrToNames(gearRow[i], 2);
+      if (statName) {
+        //* + 1 because stats number are one "line" after their name
+        stats[statName] = parseInt(gearRow[i + 1]) || 0;
+      }
+    }
+  
+    console.log(`${gearName} Stats `, stats);
+    return stats;
   }
   
-  //! (idea wip) On Search
+  function updateStatsWindow(equippedGearIds) {
+    //* Receive lists of equiped id
+    console.log('Equiped IDs', equippedGearIds);
+
+    const statsWindow = document.querySelector('.stats-window');
+    const statElements = statsWindow.querySelectorAll('li[data-stats]');
+
+    const totalStats = {};
+
+    //* Get total stats from all equipped gear
+    //* For each id in equippedGeadIds list will get an object with the name of every stat and their value
+    equippedGearIds.forEach(gearId => {
+      const gearStats = getGearStats(gearId);
+      if (gearStats) {
+        //* loop to add stat name and value to new list (totalStats) but if name already exist -> add the value to that name in the list so we get a total 
+        for (const statName in gearStats) {
+          if (!totalStats[statName]) {
+            totalStats[statName] = 0;
+          }
+          totalStats[statName] += gearStats[statName];
+        }
+      }
+    });
+
+    //* Update the stats window in the DOM
+    statElements.forEach(li => {
+      //* with number from data-stats -> convert it to name
+      // const statType = getStatName(parseInt(li.getAttribute('data-stats')));
+      const statType = nbrToNames(li.getAttribute('data-stats'), 2);
+
+      //* change text of span with value of matching data-stats (~names)
+      if (statType) {
+        //* will get the value of the stat linked to the stat name [statType] from totalStats and updates the dom
+        const statValue = totalStats[statType] || 0;
+        li.querySelector('span').textContent = statValue;
+      }
+    });
+  }
+
+  function onGearEquipped() {
+
+    //* Get all equipped gear Ids
+    const equippedGearIds = getEquippedGearIds();
+  
+    //* Update the stats window
+    updateStatsWindow(equippedGearIds);
+  }
+
+
+  //! On Job Change =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  // todo : redo first fetch to display diff jobs and fuse with build save
+  function onJobChange() {
+    // too lazy for now 
+    //-> if changes Job 
+    //  -> offer to save current set (window with warning 'gear will del, do you want to save ? y/n)
+    //    -> if (yes) 
+    //      -> save (how ? idk yet ¯\_(ツ)_/¯, should learn firebase maybe)
+    //    -> if (no)
+    //      -> empty current equiped gear
+    //      -> and equip the new job selected
+  }
+
+  //! (idea wip) On Search =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   /*
   function loadMoreSearchedItems() {
@@ -630,9 +747,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     observeLastItem();
   }
   */
+ 
 
 
-  //! Observer Last Item + Load More Items
+  //! Observer Last Item + Load More Items =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   //? Functions to observe the last item in searchResults so when it comes close to viewport 
   //* -> will lauch loadMoreItems() and add 20 more items in searchResults
   //* reduced waiting time from ~10s to ~4s with that (async functions etc, but mainly that I think) 
@@ -677,7 +795,7 @@ function closeJobSelector() {
 }
 
 
-//! Closing Window When 'Click' Outside Of It
+//! Closing Window When 'Click' Outside Of It =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function outsideClickClose(windowName, closingWingowButton) {
   document.addEventListener('click', function(e) {
 
