@@ -1,36 +1,16 @@
-// xivapi private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0
-
 //! Fetch test...
 
-// fetch("https://xivapi.com/item/1675?columns=ID,Name,Description,Lv,LevelItem,ClassJobCategory.Name&private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0", { mode: 'cors' })
-// 	.then(response => response.json())
-// 	.then(data => {
-//     console.log(console.info(data));
-//   })
-//   .catch(error => {console.log("Erreur lors de la récup des données :", error);
-// })
-
-// =-=-=-=-=| XIVAPI : charachters |=-=-=-=-=
-
-// fetch("https://xivapi.com/character/search?name=Nima+Min&server=Twintania&private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0", { mode: 'cors' })
+// XIVAPI characters :
+// fetch("https://xivapi.com/character/search?name=Random+Name&server=Twintania&private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0", { mode: 'cors' })
 // 	.then(response => response.json())
 // 	.then(data => {
 //     console.log(data);
 //   })
 //   .catch(error => {console.log("Erreur lors de la récup des données :", error);
 // })
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-// fetch("https://api.kalilistic.io/v1/lodestone/player?playerName=Nima%20Min&worldName=Twintania")
-// 	.then(response => response.json())
-// 	.then(data => {
-//     console.log(console.info(data));
-//   })
-//   .catch(error => {console.log("Erreur lors de la récup des données :", error);
-// })
-
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // todo : can save equiped set (by jobs) if logged in (firebase of smthing ?)
-
 
 //! =-=-=-=-=| Variables |=-=-=-=-=
 import * as gearVar from './numberToName.js'
@@ -47,7 +27,8 @@ const mainJobLogo = document.querySelector('.job-change')
 
 const profile = document.querySelector('.profile');
 
-const jobSelector = document.querySelector('.job-selector') 
+const jobSelector = document.querySelector('.job-selector')
+const profileJob = document.querySelector('.profile-job')
 const jobSelectorBG = document.querySelector('.dark-bg')
 const jobSelectorX = document.querySelector('.job-selector--x')
 
@@ -62,6 +43,9 @@ let itemData = [];
 let equippedGear = [];
 let equippedGearIds = [];
 
+//! other
+//* removes " and \
+let regex = /["\\]/g;
 
 
 
@@ -207,7 +191,8 @@ fetch("info.json")
         jobstone: job.jobstone,
         jobicon: job.jobicon,
         shortname: job.shortname,
-        fullname: job.fullname
+        fullname: job.fullname,
+        basehp: job.basehp
       };
     } else {
       return 'Job not found';
@@ -215,6 +200,8 @@ fetch("info.json")
   }
 
   //! Empty the gear boxes in case allready equiped something in previous chosen job
+  // todo : must confirm before changing job, if yes -> clear id equiped from list of that job
+  // todo2 : if save -> save id equiped of that job then change 
   function emptyGearBox() {
     gearBoxes.forEach(gearBox => {
       gearBox.innerHTML = ''
@@ -240,6 +227,7 @@ fetch("info.json")
         class="job-change gear-box" 
         style="background: url('${jobInfo.jobicon}') center/cover" 
         data-job="${datajob}"
+        data-hp="${jobInfo.basehp}"
         data-effect="gear-box--anim" 
         >
       </div>
@@ -284,7 +272,8 @@ async function fetchData() {
     //* csv response to text -> then split into rows and columns to convert the CSV ino a .json
     const csvText = await csvResponse.text();
     const rows = csvText.split('\n');
-    const csvData = rows.map(row => row.split(','));
+    const csvFullData = rows.map(row => row.split(','));
+    const csvData = csvFullData.filter(item => item[gearVar.levelReq] >= 90)
 
     const infoData = await infoResponse.json();
     const numberToNameData = await numberToNameResponse.json();
@@ -414,7 +403,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           // console.log('Other');
   
           //* Copy csvData but filter it and only takes items that are related to job chosen and to gear slot clicked
-          filteredData = csvData.filter(item => fullJobNbrList().includes(item[gearVar.jobReq]) && item[gearVar.equipSlot] === gearType);
+          filteredData = csvData.filter(item => fullJobNbrList().includes(item[gearVar.jobReq]) && item[gearVar.equipSlot] === gearType && item[gearVar.levelReq] >= 90);
   
           // todo : same ↑
           console.log(`Found ${filteredData.length} Items for '${nbrToNames(String(Job), 0)}' to equip on '${nbrToNames(gearType, 1)}'`);
@@ -590,25 +579,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
 
-      console.log('Saving ...');
+      const test = csvData.find(job => job[gearVar.itemId] === dataItemId);
+      const itemName = test[gearVar.SingItemName].toLowerCase().replace(regex, '')
+      
+      console.log('"Saving" ...');
       equipGear(Job, dataGearSlot, dataItemId)
 
       closeGearWindow()
-  
-      if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
+
+      //! remplacr ing only in the one i clicked on (or else many bugs)
+      // gearGrid.querySelector(`[data-geartype="12"]`).innerHTML != ''
+
+      //! 🐛 : find a w y to equip ring only on '.gear-box' i clicked on and not like other gear type (otherwise only first ring could equip a ring)
+      if (dataGearSlot === "12") {
+        e.target.innerHTML = `
+          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="${itemName}">
+        `
+      } else if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
         gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
-          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="Item Name here">
+          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="${itemName}">
         `
 
-        const gearRow = csvData.find(row => row[0] === dataItemId);
-        console.log(`Gear Id#${dataItemId} Stats ***********************`);
-        console.log(`${nbrToNames(gearRow[66], 2)} => +${gearRow[67]}`);
-        console.log(`${nbrToNames(gearRow[68], 2)} => +${gearRow[69]}`);
-        console.log(`${nbrToNames(gearRow[70], 2)} => +${gearRow[71]}`);
-        console.log(`${nbrToNames(gearRow[72], 2)} => +${gearRow[73]}`);
-        console.log('*******************************************');
-
-        //! get all stats for window-stats
+        //! Get all stats for window-stats
         onGearEquipped()
       }
     }
@@ -617,7 +609,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   //! "Save" Gear Equiped =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   function equipGear(job, gearSlot, gearId) {
-    console.log(`job : ${job}, ${typeof(job)} | gearSlot : ${gearSlot}, ${typeof(gearSlot)} | gearId : ${gearId}, ${typeof(gearId)}`);
+    // console.log(`job : ${job}, ${typeof(job)} | gearSlot : ${gearSlot}, ${typeof(gearSlot)} | gearId : ${gearId}, ${typeof(gearId)}`);
 
     //* Find the currently equiped job in equippedGear[]
     let jobEntry = equippedGear.find(elem => elem[job]);
@@ -653,7 +645,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const gearRow = csvData.find(row => row[0] === gearId);
     // if (!gearRow) return null;
 
-    let regex = /["\\]/g; //* regex 'cause i just learned about them :)
     const gearName = gearRow[10].replace(regex, '')
 
     //* Create a stats object with stats name & their value
@@ -695,10 +686,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
+    console.log('totalStats ', totalStats);
+
+    
+
+    //! HP calculation (lvl90 only)
+    //* 2 variables : base Hp (change depending on jobs) & final multiplicator (if tank -> 35 else 24)
+    let baseHp = profileJob.firstElementChild.getAttribute(`data-hp`)
+    let dataJob = profile.firstElementChild.getAttribute('data-job')
+
+    //* if job is a tank -> 35 else 24
+    let jobFinalMulti = (dataJob === '20' || dataJob === '22' || dataJob === '98' || dataJob === '149') ? 35 : 24;
+
+    // const jobFinalMulti = ;
+
+    //--> lvl90 HP = ( lvlMod,HP * (jobMod,HP / 100 ) ) + ( (Vitality - lvlMod,Main ) * jobFinalMulti )
+    const HP = parseInt(3000 * ( baseHp / 100 )) + (( totalStats.vitality - 390) * jobFinalMulti )
+
+    document.querySelector('.HP').innerHTML = `
+      <div>
+        <div>HP</div>
+        <div>${HP}</div>
+      </div>
+      <div class="bar"></div>
+    `
+
     //* Update the stats window in the DOM
     statElements.forEach(li => {
       //* with number from data-stats -> convert it to name
-      // const statType = getStatName(parseInt(li.getAttribute('data-stats')));
       const statType = nbrToNames(li.getAttribute('data-stats'), 2);
 
       //* change text of span with value of matching data-stats (~names)
@@ -707,6 +722,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const statValue = totalStats[statType] || 0;
         li.querySelector('span').textContent = statValue;
       }
+
     });
   }
 
