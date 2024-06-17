@@ -237,5 +237,12 @@ a{
   }
 }
 
+#gear-search{
+  border: 2px solid #ccc;
+  outline: none;
+  &:focus{
+    border: 2px groove rgb(217, 195, 53);
+  }
+}
 
 

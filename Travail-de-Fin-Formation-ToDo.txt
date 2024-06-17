@@ -1,0 +1,39 @@
+Travail de Fin Formation : ToDo !
+
+TFF must :
+  - Page promotionelle sur WordPress !!!
+  - PowerPoint ??
+
+
+
+QoL :
+  - BackToTop button when scroll past gear window's size
+  - add to DOM how many Items found for choosen job (line ~417)
+
+BurgerMenu to filter options :
+  - range 0 - 90 ==> link to level of gear displayed on gear window selection
+
+Saving options :
+  - FireBase !!! 
+  - condition to save : gear equiped everywhere (no shield) && logged in.
+  - 2 way to save : saving button, click 'yes, save' onJobSave (warning popup)
+  - save equiped gear ids only for current job
+	
+Stats : 
+  - Add natural base stats
+  - (remove stats can't calculate)
+
+Kown bug : 
+  - ring only equips to one || equip to both but takes stats of only one
+
+
+
+
+
+
+
+
+
+
+
+

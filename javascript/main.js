@@ -52,10 +52,6 @@ let regex = /["\\]/g;
 
 //! =-=-=|> ToDo Notes : (with 'better Comments' plugin on vsCode)
 /* 
-  ! For Pc Version (last)
-  todo : (idea) quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
-  todo : (idea) quand cloque off le search window, enlever toutes les classe draggeable
-
   ! --> Job Selector + Saving
   // todo : take job selected into profile 
   // todo : job selector popup when clicking on job-stone too
@@ -90,6 +86,10 @@ let regex = /["\\]/g;
   // todo : translate numbers to name and asign them to the right stats 
   * name : BaseParam[0, 1, 2 & 3], stats number : BaseParamValue[0, 1, 2 & 3] 
   * (not 4 & 5, haven't figured out their use yet...)
+
+  ! For Pc Version (last)
+  todo : (idea) quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
+  todo : (idea) quand cloque off le search window, enlever toutes les classe draggeable
 
   ! Useful Stuff
   // // todo : take as param classJobCategory -> look through numberToName.json if exist as proprety -> then takes its value
@@ -473,7 +473,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           loadMoreItems(filteredData)
         } else{
-          searchResults.innerHTML = `Could Not Find Item ._.`
+          searchResults.innerHTML = `
+            <div class="item">
+              <div style="color:white;font-size:14px;width:100%;display:flex;justify-content:center;align-items:center;">
+                Sorry, could not find your item ._.
+              </div>
+            </div>
+          `
         }
   
       }
@@ -742,7 +748,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
   //! On Job Change =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // todo : redo first fetch to display diff jobs and fuse with build save
   function onJobChange() {
     // too lazy for now 
     //-> if changes Job 
@@ -791,15 +796,21 @@ fetchData()
 function openGearWindow() {
   gearWindow.classList.remove('gear-window-pop-reverse');
   gearWindow.classList.add('gear-window-pop')
+
+  setTimeout(() => {
+    gearSearchBar.focus()
+  }, 800);
 }
 function closeGearWindow() {
   gearWindow.classList.remove('gear-window-pop')
   gearWindow.classList.add('gear-window-pop-reverse');
   gearSearchBar.value = ''
+  gearSearchBar.blur() //* 'unfocus' the search bar
 }
 
 function openJobSelector() {
   jobSelectorBG.classList.remove('hidden');
+  
 }
 function closeJobSelector() {
   jobSelectorBG.classList.add('hidden');
@@ -829,6 +840,7 @@ gearGrid.addEventListener('click', e => {
     //? Stops event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();
     openGearWindow()
+
   }
 })
 outsideClickClose(gearWindow, gearWindowX)
@@ -854,3 +866,8 @@ document.querySelector('.job-save').addEventListener('click', e => {
 })
 outsideClickClose(jobSelectorBG, jobSelectorX)
 jobSelectorX.addEventListener('click', closeJobSelector)
+
+document.querySelector('.burger-menu').addEventListener('click', () => {
+  document.querySelector('.burger-menu').classList.toggle('close-burger')
+})
+
