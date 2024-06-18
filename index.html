@@ -80,15 +80,23 @@
             </div>
           </div>
 
-          <div id="" class="burger-menu">
+          <button class="burger-menu">
             <span></span>
             <span></span>
             <span></span>
-          </div>
+          </button>
 
-          <!-- <div>
-            <input type="range" name="" id="">
-          </div> -->
+          <div class="profile-menu">
+            <div class="range">
+              <div>
+                Level Min for Gears (the lower, the higher the loading time) : <span>1</span>
+                <input type="range" id="rangelvl" name="rangelvl" min="0" max="90" step="10" value="90"> <span>90</span>
+              </div>
+              <div>
+                Current Level Min: <span class="chosen-lvl">90</span>
+              </div>
+            </div>
+          </div>
 
           <!-- <div class="select-filter">
             test
@@ -106,7 +114,7 @@
             <!-- todo : 'animation' on job selection window https://www.instagram.com/reel/C4pfZqlAE_T/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA== -->
             <div class="job-stone" >
               <img src="https://lds-img.finalfantasyxiv.com/h/H/BvKxMwolC1uK54EhC0OCvZnAqY.png" alt="">
-              <span><span>choose a Job</span></span>
+              <span><span>choose a class</span></span>
             </div>
             <!-- <div class="save">
               <button><i class="fa-regular fa-floppy-disk"></i></button>
@@ -133,7 +141,7 @@
               <div class="gear-box" data-geartype="9" style="background: url('https://lds-img.finalfantasyxiv.com/h/m/LpauiLwCKzVPqLzMrC_BlS0MgI.png') center/cover no-repeat"></div>
               <div class="gear-box" data-geartype="10" style="background: url('https://lds-img.finalfantasyxiv.com/h/S/N9G11AlGZU7v7Ls9TYvVx3sfa0.png') center/cover no-repeat"></div>
               <div class="gear-box" data-geartype="11" style="background: url('https://lds-img.finalfantasyxiv.com/h/l/VPwTZhtTXKT0P04NJU01m1ZtYI.png') center/cover no-repeat"></div>
-              <div class="gear-box" data-geartype="12" style="background: url('https://lds-img.finalfantasyxiv.com/h/0/Xv-fBjmPkm4Jv4hcukJo69-Leo.png') center/cover no-repeat"></div>
+              <div class="gear-box" data-geartype="12" data-name="first-ring"data-name="second-ring" style="background: url('https://lds-img.finalfantasyxiv.com/h/0/Xv-fBjmPkm4Jv4hcukJo69-Leo.png') center/cover no-repeat"></div>
               <div class="gear-box" data-geartype="12" data-name="second-ring" style="background: url('https://lds-img.finalfantasyxiv.com/h/0/Xv-fBjmPkm4Jv4hcukJo69-Leo.png') center/cover no-repeat"></div>
             </div>
             
@@ -260,7 +268,7 @@
             <div class="physial">
               <div>physial</div>
               <ul>
-                <li class="full-stats">attack power<span>0</span></li>
+                <li class="full-stats"  data-stats="1">attack power<span>0</span></li>
                 <li class="full-stats" data-stats="45">skill speed<span>0</span></li>
               </ul>
             </div>
