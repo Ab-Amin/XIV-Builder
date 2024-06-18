@@ -24,6 +24,9 @@ const mageDiv = document.querySelector('.mages');
 const mainJobLogo = document.querySelector('.job-change')
 
 const profile = document.querySelector('.profile');
+const profileMenu = document.querySelector('.profile-menu')
+const burgerX = document.querySelector('.burger-menu')
+const rangelvl = document.querySelector('#rangelvl')
 
 const jobSelector = document.querySelector('.job-selector')
 const profileJob = document.querySelector('.profile-job')
@@ -58,6 +61,8 @@ let regex = /["\\]/g;
   // todo : add list and store job, id of gear equiped and on which gear type 
   todo : give warning if didn't save, will lose previous 'build' if no -> empty build, if yes -> save + change job
   todo : add condition to have something equiped on every slot before saving ( list.length === 11 (- shield))
+
+  ? save equippedGearIds or equippedGear, need to choose (EquipedIds is more accurate)
 
 
   ! --> On Search
@@ -390,11 +395,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const gearType = e.target.closest('.gear-box').getAttribute('data-geartype');
     const gearType1 = e.target.closest('.gear-box').getAttribute('data-geartype1')
     const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
+    let minLvl = rangelvl.value
 
     
     //* Will display gear if has selected a job and has clicked on a gear slot
     if (Job && gearType || gearType1) {
-
       startLoading() //* doesn't appear until the very end... ¯\_(ツ)_/¯
       
       try{
@@ -410,7 +415,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           filteredData = csvData.filter(item => 
             fullJobNbrList().includes(item[gearVar.jobReq]) && 
             item[gearVar.equipSlot] === gearType1 && 
-            item[gearVar.levelReq] >= 90
+            item[gearVar.levelReq] >= minLvl
           );
   
           // todo : change the log to put it in the DOM so user can see how many results found and for what equip (for fun c:)
@@ -422,7 +427,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           filteredData = csvData.filter(item => 
             fullJobNbrList().includes(item[gearVar.jobReq]) && 
             item[gearVar.equipSlot] === gearType && 
-            item[gearVar.levelReq] >= 90
+            item[gearVar.levelReq] >= minLvl
           );
   
           // todo : same ↑
@@ -566,7 +571,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const elements = document.querySelectorAll('.item-stats');
   
     elements.forEach(element => {
-      const statValue = parseInt(element.textContent); // Assuming the stat value is the text content of the element
+      const statValue = parseInt(element.textContent);
       if (statValue === 0) {
         element.parentElement.remove();
       }
@@ -591,29 +596,45 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       const test = csvData.find(job => job[gearVar.itemId] === dataItemId);
-      const itemName = test[gearVar.SingItemName].toLowerCase().replace(regex, '')
+      const itemName = test[gearVar.SingItemName].replace(regex, '')
       
       console.log('"Saving" ...');
       equipGear(Job, dataGearSlot, dataItemId)
 
       closeGearWindow()
 
-      //! remplac ring only in the one i clicked on (or else many bugs)
-      // gearGrid.querySelector(`[data-geartype="12"]`).innerHTML != ''
+      //? original
+      // if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
+      //   gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
+      //     <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
+      //   `
+      // }
 
       //! 🐛 : find way to equip ring only on '.gear-box' i clicked on and not like other gear type (otherwise only first ring could equip a ring)
-      if (dataGearSlot === "12") {
-        e.target.innerHTML = `
-          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="${itemName}">
-        `
-      } else if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
-        gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
-          <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="${itemName}">
-        `
+      if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
 
-        //! Get all stats for window-stats
-        onGearEquipped()
+        if (dataGearSlot === "12") {
+          console.log('ring equiped');
+
+          if (gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML != '' ) {
+            
+
+          } else {
+            gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
+              <img src="https://xivapi.com/i/${dataIconId}.png" alt="${itemName}" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
+            `
+          }
+
+        } else if (gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`)) {
+          gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
+            <img src="https://xivapi.com/i/${dataIconId}.png" alt="${itemName}" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
+          `
+        }
+
       }
+
+      //! Get all stats for window-stats
+      onGearEquipped()
     }
   })
   
@@ -698,9 +719,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     console.log('totalStats ', totalStats);
-
-    
-
+  
     //! HP calculation (lvl90 only)
     //* 2 variables : base Hp (change depending on jobs) & final multiplicator (if tank -> 35 else 24)
     let baseHp = profileJob.firstElementChild.getAttribute(`data-hp`)
@@ -738,7 +757,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function onGearEquipped() {
-
     //* Get all equipped gear Ids
     const equippedGearIds = getEquippedGearIds();
   
@@ -794,18 +812,18 @@ fetchData()
 //! Style Js (open/closing popups, etc)
 
 function openGearWindow() {
-  gearWindow.classList.remove('gear-window-pop-reverse');
-  gearWindow.classList.add('gear-window-pop')
+  gearWindow.classList.remove('window-pop-reverse');
+  gearWindow.classList.add('window-pop')
 
   setTimeout(() => {
     gearSearchBar.focus()
-  }, 800);
+  }, 1500);
 }
 function closeGearWindow() {
-  gearWindow.classList.remove('gear-window-pop')
-  gearWindow.classList.add('gear-window-pop-reverse');
-  gearSearchBar.value = ''
   gearSearchBar.blur() //* 'unfocus' the search bar
+  gearWindow.classList.remove('window-pop')
+  gearWindow.classList.add('window-pop-reverse');
+  gearSearchBar.value = ''
 }
 
 function openJobSelector() {
@@ -816,6 +834,15 @@ function closeJobSelector() {
   jobSelectorBG.classList.add('hidden');
 }
 
+function openProfileMenu() {
+  profileMenu.classList.remove('window-pop-reverse');
+  profileMenu.classList.add('window-pop')
+}
+function closeProfileMenu() {
+  profileMenu.classList.remove('window-pop')
+  profileMenu.classList.add('window-pop-reverse');
+}
+
 
 //! Closing Window When 'Click' Outside Of It =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 function outsideClickClose(windowName, closingWingowButton) {
@@ -823,13 +850,15 @@ function outsideClickClose(windowName, closingWingowButton) {
 
     //* if target is not in the popupwindow and not the close-button either --> then closes the popup
     if (!windowName.contains(e.target) && e.target !== closingWingowButton) {
-
+      gearSearchBar.blur()
+      
       //* kept closing even when not opened, so added condition to only close when it has the class that make it open 
-      if (windowName.classList.contains('gear-window-pop')){
+      if (windowName.classList.contains('window-pop')){
         closeGearWindow()
       }
 
       closeJobSelector()
+
     }
   });
 }
@@ -867,7 +896,42 @@ document.querySelector('.job-save').addEventListener('click', e => {
 outsideClickClose(jobSelectorBG, jobSelectorX)
 jobSelectorX.addEventListener('click', closeJobSelector)
 
-document.querySelector('.burger-menu').addEventListener('click', () => {
-  document.querySelector('.burger-menu').classList.toggle('close-burger')
+
+burgerX.addEventListener('click', (e) => {
+  // burgerX.classList.toggle('.close-burger')
+  if (!e.target.closest('.close-burger')) {
+    burgerX.classList.add('close-burger')
+    e.stopPropagation();
+    openProfileMenu()
+  } else if (e.target.closest('.close-burger')) {
+    burgerX.classList.remove('close-burger')
+    closeProfileMenu()
+  }
 })
+function outsideClickCloseProfileMenu() {
+  document.addEventListener('click', function(e) {
+
+    //* if target is not in the popupwindow and not the close-button either --> then closes the popup
+    if (!profileMenu.contains(e.target) && e.target !== burgerX) {
+
+      //* kept closing even when not opened, so added condition to only close when it has the class that make it open 
+      if (profileMenu.classList.contains('window-pop')){
+        closeProfileMenu()
+      }
+      closeProfileMenu()
+      burgerX.classList.remove('close-burger')
+    }
+  });
+}
+outsideClickCloseProfileMenu()
+
+
+rangelvl.addEventListener('change', () => {
+  if (rangelvl.value == 0) {
+  document.querySelector('.chosen-lvl').innerHTML = 1
+  } else{
+    document.querySelector('.chosen-lvl').innerHTML = rangelvl.value
+  }
+})
+console.log('min lvl gear : ', rangelvl.value);
 

@@ -1,19 +1,42 @@
+@keyframes window-pop {
+  0%{
+    transform: translateX(100%);
+  }
+  100%{
+    transform: translate(0%);
+  }
+}
+@keyframes window-pop-reverse {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+.window-pop{
+  animation: window-pop .6s cubic-bezier(0.57, 1.55, 0.68, 0.89) forwards;
+}
+.window-pop-reverse {
+  animation: window-pop-reverse .6s cubic-bezier(0.57, 1.55, 0.68, 0.89) forwards;
+}
+
 .profile{
   @media screen and (min-width:800px) {
     min-width: 375px;
     max-width: 100%;
     margin: 0 auto;
   }
-
-  background-color: #4b4b4b;
-  padding: 5px;
   
   position: relative;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
-
+  align-items: center
+  ;
+  background-color: #4b4b4b;
+  padding: 5px;
+  overflow-x: hidden;
   max-width: 100%;
   margin: 0 auto;
   padding: 5px 10px; 
@@ -60,18 +83,65 @@
         }
       }
     }
-
   }
+  
+  .profile-menu{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
 
+    transform: translateX(100%);
+    transition: all .5s cubic-bezier(0.57, 1.55, 0.68, 0.89);
+
+    background-color: #4b4b4b;
+    border-radius: 15px 15px 0 0;
+    font-size: 14px;
+    color: #f3f3f3;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .range{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      
+      div {
+        display: flex;
+        align-items: center;
+
+        span{
+          color: rgb(232, 198, 8);
+          font-weight: bold;
+          font-size: 15px;
+        }
+        
+        #rangelvl{
+          cursor: pointer;
+        }
+        
+        .chosen-lvl{
+          margin-left: 4px;
+        }
+      }
+
+    }
+  }
 }
-
 
 .burger-menu{
   display: block;
   position: absolute;
   top: .5rem;
   right: .5rem;
-  z-index: 1;
+  z-index: 2;
+  background: none;
+  border: none;
 
   span{
     display: block;
@@ -97,6 +167,7 @@
 }
 
 .close-burger{
+
   span{
     background: rgb(202, 175, 21);
   }
@@ -114,7 +185,6 @@
     transition: all 0.5s cubic-bezier(0.77, 0.2, 0.05, 1);
     transform: rotate(-45deg) translateY(-12px);
   }
-
 
 }
 

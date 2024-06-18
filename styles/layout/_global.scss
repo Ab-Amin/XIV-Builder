@@ -81,7 +81,7 @@ a{
 
 // =-=-=| Animations |=-=-=
 
-@keyframes gear-window-pop {
+@keyframes window-pop {
   0%{
     transform: translateX(100%);
   }
@@ -89,7 +89,7 @@ a{
     transform: translate(0%);
   }
 }
-@keyframes gear-window-pop-reverse {
+@keyframes window-pop-reverse {
   0% {
     transform: translateX(0%);
   }
@@ -97,11 +97,11 @@ a{
     transform: translateX(100%);
   }
 }
-.gear-window-pop{
-  animation: gear-window-pop .6s cubic-bezier(0.57, 1.55, 0.68, 0.89) forwards;
+.window-pop{
+  animation: window-pop .6s cubic-bezier(0.57, 1.55, 0.68, 0.89) forwards;
 }
-.gear-window-pop-reverse {
-  animation: gear-window-pop-reverse .6s cubic-bezier(0.57, 1.55, 0.68, 0.89) forwards;
+.window-pop-reverse {
+  animation: window-pop-reverse .6s cubic-bezier(0.57, 1.55, 0.68, 0.89) forwards;
 }
 
 
@@ -122,6 +122,10 @@ a{
   z-index: 5;
 
   .job-selector{
+    @media screen and (min-width:800px) {
+      transform: translate(-50%, -50%);
+    }
+
     border: 2px groove rgb(168, 155, 65);
     background-color: rgb(39, 39, 39);
     border-radius: 20px;
@@ -130,7 +134,7 @@ a{
     position: absolute;
     top: 45%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -100%);
 
     min-width: 355px;
     height: 460px;
