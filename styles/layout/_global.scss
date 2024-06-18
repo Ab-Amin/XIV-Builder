@@ -249,4 +249,63 @@ a{
   }
 }
 
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes fadeOut {
+  from {opacity: 1;}
+  to {opacity: 0;}
+}
+#quesiton-mark{
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  color: #ccc;
 
+  .fa-circle-question{
+    position: relative;
+    cursor: pointer;
+
+    span{
+      visibility: hidden;
+      position: absolute;
+      z-index: 1;
+      bottom: -2px;
+      left: -8.8rem;
+
+      width: fit-content;
+      margin-left: -80px;
+      padding: 5px 10px;
+      font-size: 12px;
+      text-align: center;
+      white-space: nowrap;
+
+      background-color: #656565;
+      color: #fff;
+      border-radius: 6px;
+      
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 7px;
+        right: -9px;
+        margin-left: -5px;
+
+        border-width: 5px;
+        border-style: solid;
+        border-color:  transparent transparent transparent #656565;
+      }
+
+    }
+
+    .show {
+      visibility: visible;
+      animation: fadeIn 1s
+    }
+
+
+  }
+
+}

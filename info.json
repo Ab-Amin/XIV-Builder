@@ -8,6 +8,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/V/NUXU4h6iXzF8HS4BxHKYf7vOa0.png",
           "CSVcode" : 20,
           "basehp" : 140,
+          "basestr" : 100,
+          "basevit" : 110,
+          "basedex" : 95,
+          "baseint" : 60,
+          "basemnd" : 100,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/e3/e3d97bf973187d1fe29f210f31a98136103d8d4b.png?n6.58"
         },
         {
@@ -16,6 +21,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/0/U3f8Q98TbAeGvg_vXiHGOaa2d4.png",
           "CSVcode" : 22,
           "basehp" : 145,
+          "basestr" : 105,
+          "basevit" : 110,
+          "basedex" : 95,
+          "baseint" : 40,
+          "basemnd" : 55,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/db/db20dc6aef8b1aa91c682c38d4d0a9977d621196.png?n6.58"
         },
         {
@@ -24,6 +34,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/9/5JT3hJnBNPZSLAijAF9u7zrueQ.png",
           "CSVcode" : 98,
           "basehp" : 140,
+          "basestr" : 105,
+          "basevit" : 110,
+          "basedex" : 95,
+          "baseint" : 60,
+          "basemnd" : 40,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/bf/bfce0e79e24108698f74552fde21aa7b9983de86.png?n6.58"
         },
         {
@@ -32,6 +47,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/8/fc5PYpEFGrg4qPYDq_YBbCy1X0.png",
           "CSVcode" : 149,
           "basehp" : 120,
+          "basestr" : 100,
+          "basevit" : 110,
+          "basedex" : 95,
+          "baseint" : 60,
+          "basemnd" : 100,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/70/70b2abeab9a809776f4df4591c76c550495eb0ac.png?n6.58"
         }
       ]
@@ -44,6 +64,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/G/Na619RGtVtbEvNn1vyFoSlvZ84.png",
           "CSVcode" : 25,
           "basehp" : 105,
+          "basestr" : 55,
+          "basevit" : 100,
+          "basedex" : 105,
+          "baseint" : 105,
+          "basemnd" : 115,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/5b/5bba45bb594ba53899f5cefdded1c4bb7da208b0.png?n6.58"
         },
         {
@@ -52,6 +77,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/s/2r8fm3U0Io7Pw1XT1tvnjPthp4.png",
           "CSVcode" : 29,
           "basehp" : 105,
+          "basestr" : 90,
+          "basevit" : 100,
+          "basedex" : 100,
+          "baseint" : 105,
+          "basemnd" : 115,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/aa/aa968bc0917ea0c98b194aba4da92ad7e95ebff9.png?n6.58"
         },
         {
@@ -60,6 +90,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/E/g7JY4S1D-9S26VarEuIkPGIrFM.png",
           "CSVcode" : 99,
           "basehp" : 105,
+          "basestr" : 50,
+          "basevit" : 100,
+          "basedex" : 100,
+          "baseint" : 105,
+          "basemnd" : 115,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/de/dece01514b18b6e17fc102d1a98c7079bcba1eeb.png?n6.58"
         },
         {
@@ -68,6 +103,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/e/G0lQTD01LdCGk5pECSc7fbbmbM.png",
           "CSVcode" : 181,
           "basehp" : 105,
+          "basestr" : 60,
+          "basevit" : 100,
+          "basedex" : 100,
+          "baseint" : 115,
+          "basemnd" : 115,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/d5/d5e32104550bbd6125cc33e6f01575697aaf7095.png?n6.58"
         }
       ]
@@ -80,6 +120,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/C/Ce_VQB6VPPJKTGJwxf3h5iujp4.png",
           "CSVcode" : 21,
           "basehp" : 110,
+          "basestr" : 110,
+          "basevit" : 100,
+          "basedex" : 105,
+          "baseint" : 50,
+          "basemnd" : 90,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/41/412323f41c51d36ac2182f6956196f510bf82554.png?n6.58"
         },
         {
@@ -88,6 +133,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/1/zWRkXGJIJhN7WHGGv1gVscRxmA.png",
           "CSVcode" : 23,
           "basehp" : 115,
+          "basestr" : 115,
+          "basevit" : 105,
+          "basedex" : 100,
+          "baseint" : 45,
+          "basemnd" : 65,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/81/81602e034f942e3c7463971cc1e2607859aced93.png?n6.58"
         },
         {
@@ -96,6 +146,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/N/EXvdQYvr1Rn4En8AKssbVwwcac.png",
           "CSVcode" : 92,
           "basehp" : 108,
+          "basestr" : 85,
+          "basevit" : 100,
+          "basedex" : 110,
+          "baseint" : 65,
+          "basemnd" : 75,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/df/df0c8b637453cd3f1c0bc08002adb05e5514b156.png?n6.58"
         },
         {
@@ -104,6 +159,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/J/Ra2GV79gVQhy6SwCrU19boTghc.png",
           "CSVcode" : 111,
           "basehp" : 109,
+          "basestr" : 112,
+          "basevit" : 100,
+          "basedex" : 108,
+          "baseint" : 60,
+          "basemnd" : 50,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/17/1745b43b70825f58dcab397379485a8317424e7a.png?n6.58"
         },
         {
@@ -112,6 +172,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/p/y8GHAXX4qhY7D-yqnCqtEPkjoo.png",
           "CSVcode" : 180,
           "basehp" : 115,
+          "basestr" : 115,
+          "basevit" : 105,
+          "basedex" : 100,
+          "baseint" : 80,
+          "basemnd" : 40,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/6d/6d9bcf36bb95205abfcc209703310fd6f1e4bbbe.png?n6.58"
         }
       ]
@@ -124,6 +189,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/b/d7BM1x8OZRZU-9fTk-D7g1t2oc.png",
           "CSVcode" : 24,
           "basehp" : 105,
+          "basestr" : 90,
+          "basevit" : 100,
+          "basedex" : 115,
+          "baseint" : 85,
+          "basemnd" : 80,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/a8/a84cfd6a6b00401586b78962afacdbb20cd8f94e.png?n6.58"
         },
         {
@@ -132,6 +202,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/2/oHLJxTt_OLDK_eQkRTBVNwwxeE.png",
           "CSVcode" : 96,
           "basehp" : 105,
+          "basestr" : 85,
+          "basevit" : 100,
+          "basedex" : 115,
+          "baseint" : 80,
+          "basemnd" : 85,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/38/385d8ce71a2066028ad6a05f85fe442b43c7619b.png?n6.58"
         },
         {
@@ -140,6 +215,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/0/ZzzbixB1HHW9FaxNXdfY7Y7lvw.png",
           "CSVcode" : 150,
           "basehp" : 105,
+          "basestr" : 90,
+          "basevit" : 100,
+          "basedex" : 115,
+          "baseint" : 85,
+          "basemnd" : 80,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/62/623cd11eb6014e22f7a20cb795b5e39a80f2b5bc.png?n6.58"
         }
       ]
@@ -152,6 +232,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/A/7JuT00VSwaFqTfcTYUCUnGPFQE.png",
           "CSVcode" : 26,
           "basehp" : 105,
+          "basestr" : 45,
+          "basevit" : 100,
+          "basedex" : 100,
+          "baseint" : 115,
+          "basemnd" : 75,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/d1/d1c991aa66668b30997f6aaadccf1fd7a0304a61.png?n6.58"
         },
         {
@@ -160,6 +245,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/b/ZwJFxv3XnfqB5N6tKbgXKnj6BU.png",
           "CSVcode" : 28,
           "basehp" : 105,
+          "basestr" : 90,
+          "basevit" : 100,
+          "basedex" : 100,
+          "baseint" : 115,
+          "basemnd" : 80,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/85/854f411cec2704fb1bd860105f8a26b599429745.png?n6.58"
         },
         {
@@ -168,6 +258,11 @@
           "jobicon" : "https://lds-img.finalfantasyxiv.com/promo/h/C/NRnqJxzRtbDKR1ZHzxazWBBR2Y.png",
           "CSVcode" : 112,
           "basehp" : 105,
+          "basestr" : 55,
+          "basevit" : 100,
+          "basedex" : 105,
+          "baseint" : 115,
+          "basemnd" : 110,
           "jobstone" : "https://lds-img.finalfantasyxiv.com/itemicon/39/39ff999454e2b2e71ea251cc0e2ebf9e506c8746.png?n6.58"
         }
       ]

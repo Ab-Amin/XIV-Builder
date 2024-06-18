@@ -1,7 +1,7 @@
 //! Fetch test...
 
 // XIVAPI characters :
-// fetch("https://xivapi.com/character/search?name=Random+Name&server=Twintania&private_key=0be9dad833724e1ebab95b987f3c0166155d12ff1a2f4adc9ee0d7a5ddd9c4d0", { mode: 'cors' })
+// fetch("https://xivapi.com/character/search?name=Random+Name&server=Twintania&private_key=", { mode: 'cors' })
 // 	.then(response => response.json())
 // 	.then(data => {
 //     console.log(data);
@@ -44,8 +44,8 @@ const gearSearchBar = document.querySelector('#gear-search')
 //! =-=-=-=-=| lists |=-=-=-=-=
 let equippedGear = [];
 let equippedGearIds = [];
+let jobBaseStat = [];
 
-let itemData = [];
 
 //! other
 //* removes " and \
@@ -172,14 +172,13 @@ fetch("info.json")
       <div class="job-name">${data.jobInfo[4].mages[i].fullname}</div>
     </div>
     `
-  }
+  } 
 
   //! Job Selector =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   //! Function that give info from info.json based on CSVcode
   function findJobByCSVcode(code) {
     //? [GPT] : Flatten the Array: Since your array contains objects that further contain arrays of job information, you need to flatten this structure to easily search through it. 
-    //? --> flatMap(...)
     //- Flatten the arrays inside jobInfo
     const allJobs = data.jobInfo.flatMap(category => {
       //- Flatten each category's job array
@@ -189,9 +188,15 @@ fetch("info.json")
     //- Find the job with the matching CSVcode
     const job = allJobs.find(job => job.CSVcode === code);
 
-    //- Return an object with both names if found, otherwise return a not found message
-    //- return (job ? job.jobicon : 'Job not found')
     if (job) {
+      jobBaseStat = []
+      jobBaseStat.push({
+        strength : job.basestr,
+        vitality : job.basevit,
+        dexterity : job.basedex,
+        intelligence : job.baseint,
+        mind : job.basemnd
+      })
       return {
         jobstone: job.jobstone,
         jobicon: job.jobicon,
@@ -252,7 +257,6 @@ fetch("info.json")
 function startLoading() {
   console.log('Loading --> Start');
   document.getElementById('loading').style.display = 'block';
-  document.getElementById('loading').offsetHeight; // - Trigger a reflow, flushing the CSS changes
 }
 function stopLoading() {
   console.log('Loading --> Stop');
@@ -333,17 +337,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         return Object.values(category).flat();
       })
 
-      //- Find the job with the matching CSVcode
       const findJob = allJobs.find(job => job.CSVcode === jobNbr);
 
-      //- Return an object with shortname
       if (findJob) {
         // console.log('Job name is : ' + findJob.shortname);
         return (findJob.shortname) 
       }
     } //* ex : will return for "23" (main job only) --> "DRG"
 
-    //- numberToName.json list
     const numToName = numberToNameData.numToName[0];
 
     //- Function to find numbers that include shortname of job
@@ -357,8 +358,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return result; 
     } //* ex : will return for DRG --> '["23", "47", "84", "76"]'   
 
-    //- Use the function to get the numbers
-    //* findNumbersWithshortname( secondJsonData.numToName[0] --> findJobShortname( findJobShortname( Job ) ) )
+    //* tldr; 
+    //* findNumbersWithshortname( secondJsonData.numToName[0] --> findJobShortname( all number related to 'Job' ) )
     return findNumbersWithshortname(numToName);
   }
 
@@ -395,7 +396,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const gearType = e.target.closest('.gear-box').getAttribute('data-geartype');
     const gearType1 = e.target.closest('.gear-box').getAttribute('data-geartype1')
     const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
-    let minLvl = rangelvl.value
+    let minLvl;
+
+    if (rangelvl.value === 0) {
+      minLvl = 1
+    } else {
+      minLvl = rangelvl.value
+    }
 
     
     //* Will display gear if has selected a job and has clicked on a gear slot
@@ -701,6 +708,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const statsWindow = document.querySelector('.stats-window');
     const statElements = statsWindow.querySelectorAll('li[data-stats]');
 
+    console.log('job base stat : ', jobBaseStat[0]);
     const totalStats = {};
 
     //* Get total stats from all equipped gear
@@ -755,6 +763,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     });
   }
+
+    // ! Fuse jobBaseStat
+    function mergeObjects(obj1, obj2) {
+
+      // jobBaseStat[0]
+      // totalStats
+
+      // Create a new object to avoid mutating the original ones
+      const merged = { ...obj1 };
+    
+      for (const key in obj2) {
+        if (obj2.hasOwnProperty(key)) {
+          if (merged.hasOwnProperty(key)) {
+            merged[key] += obj2[key];
+          } else {
+            merged[key] = obj2[key];
+          }
+        }
+      }
+    
+      return merged;
+    }
 
   function onGearEquipped() {
     //* Get all equipped gear Ids
@@ -814,10 +844,12 @@ fetchData()
 function openGearWindow() {
   gearWindow.classList.remove('window-pop-reverse');
   gearWindow.classList.add('window-pop')
-
-  setTimeout(() => {
-    gearSearchBar.focus()
-  }, 1500);
+  //* focus() only if job was chosen, cause otherwise if I close window before timeout -> 🐛😅
+  if (document.querySelector('.profile-job').firstElementChild.hasAttribute(`data-job`)) {
+    setTimeout(() => {
+      gearSearchBar.focus()
+    }, 2000);
+  }
 }
 function closeGearWindow() {
   gearSearchBar.blur() //* 'unfocus' the search bar
@@ -856,9 +888,7 @@ function outsideClickClose(windowName, closingWingowButton) {
       if (windowName.classList.contains('window-pop')){
         closeGearWindow()
       }
-
       closeJobSelector()
-
     }
   });
 }
@@ -869,7 +899,6 @@ gearGrid.addEventListener('click', e => {
     //? Stops event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();
     openGearWindow()
-
   }
 })
 outsideClickClose(gearWindow, gearWindowX)
@@ -877,7 +906,6 @@ gearWindowX.addEventListener('click', closeGearWindow)
 
 profile.addEventListener('click', e => {
   // // todo : if clicked on a 'job' => takes name of job and then closes
-
   if (e.target.classList.contains('job-change')) {
     e.stopPropagation();
     openJobSelector()
@@ -896,7 +924,6 @@ document.querySelector('.job-save').addEventListener('click', e => {
 outsideClickClose(jobSelectorBG, jobSelectorX)
 jobSelectorX.addEventListener('click', closeJobSelector)
 
-
 burgerX.addEventListener('click', (e) => {
   // burgerX.classList.toggle('.close-burger')
   if (!e.target.closest('.close-burger')) {
@@ -910,14 +937,7 @@ burgerX.addEventListener('click', (e) => {
 })
 function outsideClickCloseProfileMenu() {
   document.addEventListener('click', function(e) {
-
-    //* if target is not in the popupwindow and not the close-button either --> then closes the popup
-    if (!profileMenu.contains(e.target) && e.target !== burgerX) {
-
-      //* kept closing even when not opened, so added condition to only close when it has the class that make it open 
-      if (profileMenu.classList.contains('window-pop')){
-        closeProfileMenu()
-      }
+    if (!profileMenu.contains(e.target) && e.target !== burgerX && profileMenu.classList.contains('window-pop')) {
       closeProfileMenu()
       burgerX.classList.remove('close-burger')
     }
@@ -934,4 +954,12 @@ rangelvl.addEventListener('change', () => {
   }
 })
 console.log('min lvl gear : ', rangelvl.value);
+
+
+document.querySelector('.fa-circle-question').addEventListener('click', e => {
+  document.querySelector('#bubble').classList.toggle('show')
+  setTimeout(() => {
+    document.querySelector('#bubble').classList.remove('show')
+  }, 1300);
+})
 

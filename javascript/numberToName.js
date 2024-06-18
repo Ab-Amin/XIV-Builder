@@ -19,3 +19,11 @@ export const gearStat3 = 73;
 // // todo : translate icon codes into images with xiv icon api
 export const icons = 11;
 
+/*
+  saving here to not re-write :
+ - All Classes : gla mrd lnc rog pgl arc cnj thm acn, PLD WAR DRK GNB MNK DRG SAM NIN RPR WHM SCH AST SGE BRD MCH DNC BLM SMN RDM
+
+ - Disiple of War : gla mrd lnc rog pgl arc, PLD WAR DRK GNB MNK DRG SAM NIN RPR BRD MCH DNC
+
+ - Disiple of Magic : cnj thm acn, WHM SCH AST SGE BLM SMN RDM
+*/
