@@ -38,7 +38,7 @@ Js functionality :
     - numberToName : translated csv nummbers value to name with a lot of testing (see my excel files) & game knowledge
 
   - Job Selector :
-    - Different base stats depending on classes/jobs
+    - Base stats Changing depending on chosen classes/jobs
 
   - Gear searching (by scrolling or by name)
     - Gear Level Filter

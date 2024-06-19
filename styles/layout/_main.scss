@@ -65,6 +65,12 @@
     }
   
     .main{
+      @media screen and (min-width:800px){
+
+        section{
+          margin-bottom: 0px;
+        }
+      }
       background-color: #242024;
       padding: 10px;
       padding-top: 2rem;

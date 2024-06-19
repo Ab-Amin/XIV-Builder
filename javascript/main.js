@@ -710,6 +710,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log(`${gearName} Stats `, stats);
     return stats;
   }
+
+  function otherStats(equippedGearIds) {
+    
+    let otherStats = {}
+    let def = 0;
+    let magicDef = 0;
+    let averageIlvl = 0;
+
+    if (equippedGearIds.length > 0) {
+
+      console.log(equippedGearIds);
+
+      equippedGearIds.forEach(gearId => {
+  
+        const gearRow = csvData.find(row => row[0] === gearId);
+
+        if (gearRow) {
+          def += Number(gearRow[64])
+          magicDef += Number(gearRow[65])
+          averageIlvl += Number(gearRow[12])
+        }
+        
+      });
+
+      //! divided by 11 or 12 ???
+      averageIlvl = (averageIlvl / equippedGearIds.length).toFixed(0)
+
+      otherStats = {
+        defense: def,
+        magicDefense: magicDef,
+        averageItemlvl: averageIlvl
+      };
+      
+      console.log('other stats :', otherStats);
+      
+      return otherStats
+    } else {
+     return 'No equipped gear was found.'
+    }
+
+  }
   
   function updateStatsWindow(equippedGearIds) {
     //* Receive lists of equiped id
@@ -722,7 +763,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log(`${findJobShortname(Number(Job))} base stat : `, jobBaseStat[0]);
     const totalStats = {};
 
-    // function mergeObjects(obj1, obj2) {
+    //* Merge baseStat with totalStats
     for (const key in jobBaseStat[0]) {
       if (jobBaseStat[0].hasOwnProperty(key)) {
         if (totalStats.hasOwnProperty(key)) {
@@ -732,9 +773,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       }
     }
-      // return obj1
-    // }
-    // mergeObjects(totalStats, jobBaseStat[0]);
 
     //* Get total stats from all equipped gear
     //* For each id in equippedGeadIds list will get an object with the name of every stat and their value
@@ -797,8 +835,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     //* Update the stats window
     updateStatsWindow(equippedGearIds);
+ 
+    const othStats = otherStats(equippedGearIds);
+    console.log(othStats);
+    
+    document.querySelector('#def span').innerHTML = othStats.defense
+    document.querySelector('#magic-def span').innerHTML = othStats.magicDefense
+    document.getElementById('aIlvl').innerHTML = othStats.averageItemlvl
+
   }
 
+  //* To get base stat directly after Job Selection 
   jobSelector.addEventListener('click', e => {
     if (e.target.closest('.job')) {
       onGearEquipped()
