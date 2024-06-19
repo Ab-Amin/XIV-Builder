@@ -68,8 +68,8 @@
       "22" : "direct hit rate",
       "27" : "critical hit",
       "44" : "determination",
-      "45" : "skill speed",
-      "46" : "spell speed",
+      "45" : "skillspeed",
+      "46" : "spellspeed",
       "19" : "tenacity"
     }
   ]

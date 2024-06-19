@@ -64,6 +64,9 @@ let regex = /["\\]/g;
 
   ? save equippedGearIds or equippedGear, need to choose (EquipedIds is more accurate)
 
+  ! --> BurgerMenu to filter options :
+  // todo : range 0 - 90 ==> link to level of gear displayed on gear window selection
+
 
   ! --> On Search
   // todo : able to search for gear name on search bar (even if only writting part of the full name)
@@ -81,14 +84,15 @@ let regex = /["\\]/g;
   todo : if scrolling to the point of not seeing search bar => arrow 'back to top' apprears
   todo : ability to remove gear
 
-  ! --> (test) to get accessories gear to appear on search window 
+  ! --> Get accessories gear to appear on search window 
   // todo : Need to get the shortname of job with the number (should do with firstJsonData) 
   // todo : Then take the shortname and search through secondJsonData all the number that contains that shortname (ex : 23 -> DRG; 47 -> lnc, DRG)
   // todo : Return those number and innerHTML in clicked accessory gear all of the gear
-  todo : 🐛 rings only equip on one ||doesn't tak stats of second ring ¯\_(ツ)_/¯
+  todo : 🐛 rings only equip on one || doesn't tak stats of second ring ¯\_(ツ)_/¯
   
   ! --> Gear Stats
   // todo : translate numbers to name and asign them to the right stats 
+  todo : Add natural base stats- Add natural base stats
   * name : BaseParam[0, 1, 2 & 3], stats number : BaseParamValue[0, 1, 2 & 3] 
   * (not 4 & 5, haven't figured out their use yet...)
 
@@ -184,18 +188,23 @@ fetch("info.json")
       //- Flatten each category's job array
       return Object.values(category).flat();
     })
+    console.log(allJobs);
 
     //- Find the job with the matching CSVcode
     const job = allJobs.find(job => job.CSVcode === code);
-
     if (job) {
       jobBaseStat = []
+      //* stats calc from akhmorning.com
       jobBaseStat.push({
-        strength : job.basestr,
-        vitality : job.basevit,
-        dexterity : job.basedex,
-        intelligence : job.baseint,
-        mind : job.basemnd
+        strength : ((job.basestr / 100) * 390).toFixed(0),
+        vitality : (job.basevit).toFixed(0),
+        dexterity : ((job.basedex / 100) * 390).toFixed(0),
+        intelligence : ((job.baseint / 100) * 390).toFixed(0),
+        mind : ((job.basemnd / 100) * 390).toFixed(0),
+        skillspeed : ((job.skillspeed ? job.skillspeed : 1) * 400).toFixed(0),
+        spellspeed : ((job.skillspeed ? job.spellspeed : 1) * 400).toFixed(0),
+        tenacity : Number((job.tenacity ? job.tenacity : 1) * 400).toFixed(0),
+        piety: (((job.piety ? job.piety : 1)) * 390).toFixed(0),
       })
       return {
         jobstone: job.jobstone,
@@ -294,12 +303,9 @@ async function fetchData() {
     const csvText = await csvResponse.text();
     const rows = csvText.split('\n');
     const csvFullData = rows.map(row => row.split(','));
-
     //* Array with only gear that are equipable by class/job on numberToName.json [0]
     const csvData = csvFullData.filter(item => numberToNameKeys(numToNameJson).includes(item[gearVar.jobReq]))
     // const csvData = csvFullData
-
-
 
     return { csvData, infoData, numberToNameData }; // Return an object containing all data
 
@@ -328,30 +334,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   //! Getting All Number The Chosen Job Is A Part Of =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   //* fullJobNbrList() -> Function that will return array of string number related to choosen job 
   //* (ex for 23 (aka DRG) --> ["23", "47", "84", "76"] (aka ["DRG", "lnc, DRG", "pgl lnc, MNK DRG SAM RPR", "lnc, DRG RPR"])
+
+  function findJobShortname(jobNbr) {
+    //- Flatten the arrays inside jobInfo
+    const allJobs = infoData.jobInfo.flatMap(category => {
+      //- Flatten each category's job array
+      return Object.values(category).flat();
+    })
+
+    const findJob = allJobs.find(job => job.CSVcode === jobNbr);
+    if (findJob) {
+      // console.log('Job name is : ' + findJob.shortname);
+      return findJob.shortname
+    } else {
+      return '?'
+    }
+  } //* ex : will return for "23" (main job only) --> "DRG"
+
   function fullJobNbrList() {
     
-    function findJobShortname(jobNbr) {
-      //- Flatten the arrays inside jobInfo
-      const allJobs = infoData.jobInfo.flatMap(category => {
-        //- Flatten each category's job array
-        return Object.values(category).flat();
-      })
-
-      const findJob = allJobs.find(job => job.CSVcode === jobNbr);
-
-      if (findJob) {
-        // console.log('Job name is : ' + findJob.shortname);
-        return (findJob.shortname) 
-      }
-    } //* ex : will return for "23" (main job only) --> "DRG"
-
     const numToName = numberToNameData.numToName[0];
 
     //- Function to find numbers that include shortname of job
     function findNumbersWithshortname(obj) {
       const result = [];
       for (const key in obj) {
-        if (obj[key].includes( findJobShortname(Number(document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`))) )) {
+        if (obj[key].includes( findJobShortname( Number(document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`))) )) {
           result.push(key);
         }
       }
@@ -393,20 +401,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   gearGrid.addEventListener('click', e => {
 
-    const gearType = e.target.closest('.gear-box').getAttribute('data-geartype');
-    const gearType1 = e.target.closest('.gear-box').getAttribute('data-geartype1')
+    // - The ?. operator ensures that getAttribute is only called if gearBox is not null
+    const gearType = e.target.closest('.gear-box')?.getAttribute('data-geartype');
+    const gearType1 = e.target.closest('.gear-box')?.getAttribute('data-geartype1')
     const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
     let minLvl;
 
     if (rangelvl.value === 0) {
       minLvl = 1
     } else {
-      minLvl = rangelvl.value
+      minLvl = rangelvl.value--
     }
 
     
     //* Will display gear if has selected a job and has clicked on a gear slot
-    if (Job && gearType || gearType1) {
+    if (Job && (gearType || gearType1)) {
       startLoading() //* doesn't appear until the very end... ¯\_(ツ)_/¯
       
       try{
@@ -512,6 +521,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     itemsToLoad.forEach(item => {
+      // todo : add jobReq for "1", "30" & "31"
 
       searchResults.innerHTML += `
         <div class="item" data-itemid="${item[gearVar.itemId]}" data-geartype="${item[gearVar.equipSlot]}">
@@ -519,7 +529,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <img src="https://xivapi.com/i/${iconFunction(item[gearVar.icons], 0)}.png" alt="">
           </div>
           <div>
-            <span>${item[gearVar.SingItemName]}</span>
+            <span>${ item[gearVar.SingItemName]}</span>
             <span>lvl ${item[gearVar.levelReq]}, Ilvl ${item[gearVar.itemLevel]}</span>
             <div class="bonuses">
               <span>${nbrToNames(item[gearVar.jobReq], 0)}</span>
@@ -707,9 +717,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const statsWindow = document.querySelector('.stats-window');
     const statElements = statsWindow.querySelectorAll('li[data-stats]');
+    const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
 
-    console.log('job base stat : ', jobBaseStat[0]);
+    console.log(`${findJobShortname(Number(Job))} base stat : `, jobBaseStat[0]);
     const totalStats = {};
+
+    // function mergeObjects(obj1, obj2) {
+    for (const key in jobBaseStat[0]) {
+      if (jobBaseStat[0].hasOwnProperty(key)) {
+        if (totalStats.hasOwnProperty(key)) {
+          totalStats[key] += Number(jobBaseStat[0][key]);
+        } else {
+          totalStats[key] = Number(jobBaseStat[0][key]);
+        }
+      }
+    }
+      // return obj1
+    // }
+    // mergeObjects(totalStats, jobBaseStat[0]);
 
     //* Get total stats from all equipped gear
     //* For each id in equippedGeadIds list will get an object with the name of every stat and their value
@@ -739,6 +764,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // const jobFinalMulti = ;
 
     //--> lvl90 HP = ( lvlMod,HP * (jobMod,HP / 100 ) ) + ( (Vitality - lvlMod,Main ) * jobFinalMulti )
+    console.log(`base Hp : ${baseHp}, total Vit : ${totalStats.vitality}, final Multi : ${jobFinalMulti}`);
     const HP = parseInt(3000 * ( baseHp / 100 )) + (( totalStats.vitality - 390) * jobFinalMulti )
 
     document.querySelector('.HP').innerHTML = `
@@ -762,29 +788,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
     });
+
   }
-
-    // ! Fuse jobBaseStat
-    function mergeObjects(obj1, obj2) {
-
-      // jobBaseStat[0]
-      // totalStats
-
-      // Create a new object to avoid mutating the original ones
-      const merged = { ...obj1 };
-    
-      for (const key in obj2) {
-        if (obj2.hasOwnProperty(key)) {
-          if (merged.hasOwnProperty(key)) {
-            merged[key] += obj2[key];
-          } else {
-            merged[key] = obj2[key];
-          }
-        }
-      }
-    
-      return merged;
-    }
 
   function onGearEquipped() {
     //* Get all equipped gear Ids
@@ -793,6 +798,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     //* Update the stats window
     updateStatsWindow(equippedGearIds);
   }
+
+  jobSelector.addEventListener('click', e => {
+    if (e.target.closest('.job')) {
+      onGearEquipped()
+    }
+  })
 
 
   //! On Job Change =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -839,7 +850,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 fetchData()
 
 
-//! Style Js (open/closing popups, etc)
+//! Style Js (open/closing popups, etc) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 function openGearWindow() {
   gearWindow.classList.remove('window-pop-reverse');
@@ -876,14 +887,12 @@ function closeProfileMenu() {
 }
 
 
-//! Closing Window When 'Click' Outside Of It =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//! Closing Window When 'Click' Outside Of It
 function outsideClickClose(windowName, closingWingowButton) {
   document.addEventListener('click', function(e) {
 
     //* if target is not in the popupwindow and not the close-button either --> then closes the popup
-    if (!windowName.contains(e.target) && e.target !== closingWingowButton) {
-      gearSearchBar.blur()
-      
+    if (!windowName.contains(e.target) && e.target !== closingWingowButton) {      
       //* kept closing even when not opened, so added condition to only close when it has the class that make it open 
       if (windowName.classList.contains('window-pop')){
         closeGearWindow()
@@ -894,7 +903,9 @@ function outsideClickClose(windowName, closingWingowButton) {
 }
 
 gearGrid.addEventListener('click', e => {
-  if (e.target.classList.contains('gear-box') || e.target.closest('.gear-box').hasAttribute('data-geartype')) {
+  const closestGearBox = e.target.closest('.gear-box');
+  if (e.target.classList.contains('gear-box') || 
+  (closestGearBox && closestGearBox.hasAttribute('data-geartype'))) {
 
     //? Stops event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();
@@ -960,6 +971,6 @@ document.querySelector('.fa-circle-question').addEventListener('click', e => {
   document.querySelector('#bubble').classList.toggle('show')
   setTimeout(() => {
     document.querySelector('#bubble').classList.remove('show')
-  }, 1300);
+  }, 1500);
 })
 
