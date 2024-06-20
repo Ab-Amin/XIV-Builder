@@ -188,7 +188,7 @@ fetch("info.json")
       //- Flatten each category's job array
       return Object.values(category).flat();
     })
-    console.log(allJobs);
+    console.log('jobInfo flatmap : ', allJobs);
 
     //- Find the job with the matching CSVcode
     const job = allJobs.find(job => job.CSVcode === code);
@@ -334,7 +334,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   //! Getting All Number The Chosen Job Is A Part Of =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   //* fullJobNbrList() -> Function that will return array of string number related to choosen job 
   //* (ex for 23 (aka DRG) --> ["23", "47", "84", "76"] (aka ["DRG", "lnc, DRG", "pgl lnc, MNK DRG SAM RPR", "lnc, DRG RPR"])
-
   function findJobShortname(jobNbr) {
     //- Flatten the arrays inside jobInfo
     const allJobs = infoData.jobInfo.flatMap(category => {
@@ -507,6 +506,87 @@ document.addEventListener('DOMContentLoaded', async () => {
   
     })
 
+    //! Equiping Gear =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+    const clickedItem = e.target.closest('.item');
+    if (clickedItem) {
+      equipItem();
+    }
+
+    //* Mark ring slot as clicked to know which ring to change later (since both have same code : '12')
+    const clickedRingSlot = e.target.closest(`[data-geartype="12"]`);
+    if (clickedRingSlot) {
+      gearGrid.querySelectorAll(`[data-geartype="12"]`).forEach(slot => slot.classList.remove('clicked'));
+      clickedRingSlot.classList.add('clicked');
+    }
+
+    function equipItem() {
+
+      searchResults.addEventListener('click', e => {
+    
+        if (e.target.classList.contains('item') || e.target.closest('.item')){
+    
+          const dataItemId = e.target.closest('.item').getAttribute('data-itemid')
+          const dataGearSlot = e.target.closest('.item').getAttribute('data-geartype')
+          const dataIconId = e.target.closest('.item').firstElementChild.getAttribute('data-iconId')
+          
+          for (let i = 0; i < csvData.length; i++) {
+            if ( Number(csvData[i][gearVar.itemId]) === Number(dataItemId) ) {
+              console.log(csvData[i]);
+            }
+          }
+          
+          const test = csvData.find(job => job[gearVar.itemId] === dataItemId);
+          const itemName = test[gearVar.SingItemName].replace(regex, '')
+          
+          // const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
+          // equipGear(Job, dataGearSlot, dataItemId) //! might delete this part as equippedGearIds is better to save + change equipItem to equipGear
+
+          closeGearWindow()
+    
+          //* Check if the gear type is '12' (rings)
+          if (dataGearSlot === '12') {
+            const clickedRingSlot = gearGrid.querySelector(`[data-geartype="12"].clicked`);
+            
+            //* Find the ring slot that was clicked and equip new ring on it + add 'occupied' class
+            if (clickedRingSlot) {
+              // console.log('--> clickedRingSlot');
+              clickedRingSlot.innerHTML = `
+                <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
+              `
+              clickedRingSlot.classList.add('occupied');
+              clickedRingSlot.classList.remove('clicked');
+
+            } else {
+              // console.log('--> unoccupiedRingSlot');
+              const unoccupiedRingSlot = gearGrid.querySelector(`[data-geartype="12"]:not(.occupied)`);
+
+              if (unoccupiedRingSlot) { 
+                unoccupiedRingSlot.innerHTML = `
+                  <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
+                `
+                unoccupiedRingSlot.classList.add('occupied');
+
+              }
+            }
+          } else {
+            //* Equiping for all other gear types
+            const gearSlot = gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`);
+            
+            if (gearSlot) {
+              gearSlot.innerHTML = `
+                <img class="equiped-item" src="https://xivapi.com/i/${dataIconId}.png" alt="${itemName}" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
+              `
+            }
+          }
+
+
+          //! Get all stats for window-stats
+          onGearEquipped()
+        }
+      })
+    }
+
   });
 
 
@@ -567,7 +647,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     observeLastItem();
   }
 
-
   //! From "Number Naming" to "Full Name" =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   function nbrToNames(number, index = 0) {
     // -> [GPT] for 'index = 0' : default Value in Signature: This approach is cleaner and reduces the amount of code. It automatically sets index to 0 if it is not provided when calling the function. 
@@ -582,7 +661,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return result || undefined;
   }
 
-
   //! Remove parent of useless displayed stat (if stat = 0) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
   function removeParentIfZero() {
     const elements = document.querySelectorAll('.item-stats');
@@ -596,69 +674,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-  //! Equiping Gear + save (kinda) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  searchResults.addEventListener('click', e => {
 
-    if (e.target.classList.contains('item') || e.target.closest('.item')){
-    
-      const dataItemId = e.target.closest('.item').getAttribute('data-itemid')
-      const dataGearSlot = e.target.closest('.item').getAttribute('data-geartype')
-      const dataIconId = e.target.closest('.item').firstElementChild.getAttribute('data-iconId')
-      const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
-    
-      for (let i = 0; i < csvData.length; i++) {
-        if ( Number(csvData[i][gearVar.itemId]) === Number(dataItemId) ) {
-          console.log(csvData[i]);
-        }
-      }
-
-      const test = csvData.find(job => job[gearVar.itemId] === dataItemId);
-      const itemName = test[gearVar.SingItemName].replace(regex, '')
-      
-      console.log('"Saving" ...');
-      equipGear(Job, dataGearSlot, dataItemId)
-
-      closeGearWindow()
-
-      //? original
-      // if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
-      //   gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
-      //     <img src="https://xivapi.com/i/${dataIconId}.png" alt="" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
-      //   `
-      // }
-
-      //! 🐛 : find way to equip ring only on '.gear-box' i clicked on and not like other gear type (otherwise only first ring could equip a ring)
-      if ( gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`) ) {
-
-        if (dataGearSlot === "12") {
-          console.log('ring equiped');
-
-          if (gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML != '' ) {
-            
-
-          } else {
-            gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
-              <img src="https://xivapi.com/i/${dataIconId}.png" alt="${itemName}" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
-            `
-          }
-
-        } else if (gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`)) {
-          gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`).innerHTML = `
-            <img src="https://xivapi.com/i/${dataIconId}.png" alt="${itemName}" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
-          `
-        }
-
-      }
-
-      //! Get all stats for window-stats
-      onGearEquipped()
-    }
-  })
-  
   //! "Save" Gear Equiped =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
   function equipGear(job, gearSlot, gearId) {
-    // console.log(`job : ${job}, ${typeof(job)} | gearSlot : ${gearSlot}, ${typeof(gearSlot)} | gearId : ${gearId}, ${typeof(gearId)}`);
 
     //* Find the currently equiped job in equippedGear[]
     let jobEntry = equippedGear.find(elem => elem[job]);
@@ -742,8 +760,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         magicDefense: magicDef,
         averageItemlvl: averageIlvl
       };
-      
-      console.log('other stats :', otherStats);
       
       return otherStats
     } else {
@@ -837,11 +853,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateStatsWindow(equippedGearIds);
  
     const othStats = otherStats(equippedGearIds);
-    console.log(othStats);
+    console.log('Other stats :', othStats);
     
-    document.querySelector('#def span').innerHTML = othStats.defense
-    document.querySelector('#magic-def span').innerHTML = othStats.magicDefense
-    document.getElementById('aIlvl').innerHTML = othStats.averageItemlvl
+    //* ternary condition to not get 'undefined' right after choosin a job
+    document.querySelector('#def span').innerHTML = othStats.defense ? othStats.defense : 0
+    document.querySelector('#magic-def span').innerHTML = othStats.magicDefense ? othStats.magicDefense : 0
+    document.getElementById('aIlvl').innerHTML = othStats.averageItemlvl ? othStats.averageItemlvl : 0
 
   }
 

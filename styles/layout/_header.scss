@@ -10,7 +10,7 @@ header{
 
   width: 100%;
   height: 50px;
-  background-color: lightgray;
+  background-color: #242024;
 
   position: sticky;
   top: 0;
@@ -24,7 +24,7 @@ header{
 
     position: sticky;
 
-    background-color: lightgray;
+    background-color: #242024;
     min-width: 300px;
     height: 50px;
     padding: 0 5px;
@@ -34,12 +34,11 @@ header{
     // }
 
     .logo{
-      width: 100px;
+      width: 120px;
       height: 40px;
-      background-color: gray;
       border-radius: 10px;
-
-      text-align: center
+      display: flex;
+      align-items: center;
     }
 
     .search-bar{
@@ -57,6 +56,7 @@ header{
       flex-direction: row;
       div{
         a{
+          color: rgb(237, 237, 229);
           width: 55px;
           font-size: 22px;
           text-align: center;
