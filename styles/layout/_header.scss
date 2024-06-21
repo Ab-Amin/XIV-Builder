@@ -14,7 +14,7 @@ header{
 
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 15;
 
   .header-container{
     display: flex;
@@ -52,10 +52,15 @@ header{
     }
 
     div:last-of-type{
+      width: 90px;
       display: flex;
       flex-direction: row;
+      justify-content: space-between;
       div{
-        a{
+         width: 40px;
+        i{
+          // width: fit-content;
+          cursor: pointer;
           color: rgb(237, 237, 229);
           width: 55px;
           font-size: 22px;

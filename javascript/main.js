@@ -8,9 +8,7 @@
 //   })
 //   .catch(error => {console.log("Erreur lors de la récup des données :", error);
 // })
-// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
-// todo : can save equiped set (by jobs) if logged in (firebase of smthing ?)
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 //! =-=-=-=-=| Variables |=-=-=-=-=
 import * as gearVar from './numberToName.js'
@@ -39,6 +37,13 @@ const gearWindow = document.querySelector('.search-window')
 const gearWindowX = document.querySelector('.search-window--x')
 const searchResults = document.querySelector('.search-results')
 
+const loginPopup = document.querySelector('.login-popup') // button to open login
+const loginSignin = document.querySelector('.login-signin') // full login popup 
+const profileWrapper = document.querySelector('.profile-wrapper') // login window in popup
+const fieldText = document.querySelector('#field-text')
+const fieldPassword = document.querySelector('#field-password')
+const loginIcon = document.getElementById('login-icon')
+
 const gearSearchBar = document.querySelector('#gear-search')
 
 //! =-=-=-=-=| lists |=-=-=-=-=
@@ -50,7 +55,6 @@ let jobBaseStat = [];
 //! other
 //* removes " and \
 let regex = /["\\]/g;
-
 
 
 //! =-=-=|> ToDo Notes : (with 'better Comments' plugin on vsCode)
@@ -225,7 +229,7 @@ fetch("info.json")
     gearBoxes.forEach(gearBox => {
       gearBox.innerHTML = ''
     });
-    console.log('equipement emptied...');
+    // console.log('equipement emptied...');
   }
 
   //* When selection job --> will change profile + stone and short job name
@@ -237,7 +241,7 @@ fetch("info.json")
       var datajob = e.target.closest('.job').getAttribute('data-job')
       const jobInfo = findJobByCSVcode(Number(datajob));
 
-      console.log(`You choose ${jobInfo.shortname} (${datajob})`);
+      // console.log(`You choose ${jobInfo.shortname} (${datajob})`);
 
       emptyGearBox()
 
@@ -264,11 +268,11 @@ fetch("info.json")
 .catch(error => {console.log("Erreur lors de la récup des données :", error)})
 
 function startLoading() {
-  console.log('Loading --> Start');
+  // console.log('Loading --> Start');
   document.getElementById('loading').style.display = 'block';
 }
 function stopLoading() {
-  console.log('Loading --> Stop');
+  // console.log('Loading --> Stop');
   document.getElementById('loading').style.display = 'none';
 }
 
@@ -472,8 +476,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
     removeParentIfZero() //* remove the parent of stats that are +0 (because useless :)
-
-
+  
     //! On Search =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     gearSearchBar.addEventListener('input', () => {
   
@@ -579,12 +582,19 @@ document.addEventListener('DOMContentLoaded', async () => {
               `
             }
           }
-
-
+          
           //! Get all stats for window-stats
           onGearEquipped()
         }
       })
+    }
+
+    if (e.target.closest('.gear-box')) {
+      if (document.querySelector('.profile-job').firstElementChild?.hasAttribute(`data-job`)) {
+        setTimeout(() => {
+          gearSearchBar.focus()
+        }, 1000);
+      }
     }
 
   });
@@ -676,23 +686,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
   //! "Save" Gear Equiped =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  function equipGear(job, gearSlot, gearId) {
+  // function equipGear(job, gearSlot, gearId) {
 
-    //* Find the currently equiped job in equippedGear[]
-    let jobEntry = equippedGear.find(elem => elem[job]);
+  //   //* Find the currently equiped job in equippedGear[]
+  //   let jobEntry = equippedGear.find(elem => elem[job]);
   
-    //* If currently equiped job does not exist -> create it
-    if (!jobEntry) {
-      jobEntry = { [job]: {} };
-      equippedGear.push(jobEntry);
-    }
+  //   //* If currently equiped job does not exist -> create it
+  //   if (!jobEntry) {
+  //     jobEntry = { [job]: {} };
+  //     equippedGear.push(jobEntry);
+  //   }
   
-    //* Equip gear in the specified slot for the job (or replaces it)
-    jobEntry[job][gearSlot] = { gearId };
+  //   //* Equip gear in the specified slot for the job (or replaces it)
+  //   jobEntry[job][gearSlot] = { gearId };
   
-    console.log(`Equipped ${gearId} in slot ${gearSlot} for job ${job}`);
-    console.log('Current equippedGear:', equippedGear);
-  }
+  //   console.log(`Equipped ${gearId} in slot ${gearSlot} for job ${job}`);
+  //   console.log('Current equippedGear:', equippedGear);
+  // }
 
 
   //! Full Stats Display =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -770,7 +780,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   function updateStatsWindow(equippedGearIds) {
     //* Receive lists of equiped id
-    console.log('Equiped IDs', equippedGearIds);
+    if (equippedGearIds.length > 0) {
+      console.log('Equiped IDs', equippedGearIds);
+    }
 
     const statsWindow = document.querySelector('.stats-window');
     const statElements = statsWindow.querySelectorAll('li[data-stats]');
@@ -869,8 +881,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   })
 
+  //! Saving/Loading =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+  const saveGearSet = (jobId, equippedGearIds) => {
+    // Find if the job already exists in the savedGearSets
+    const existingJob = savedGearSets.find(set => set[jobId]);
 
-  //! On Job Change =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    if (existingJob) {
+        // Update the existing job with new equipped gear IDs
+        existingJob[jobId] = equippedGearIds;
+    } else {
+        // Add a new entry for the job
+        savedGearSets.push({ [jobId]: equippedGearIds });
+    }
+
+    console.log('Saved Gear Sets:', savedGearSets);
+};
+
+
+
+  //! On Job Change 
   function onJobChange() {
     // too lazy for now 
     //-> if changes Job 
@@ -908,11 +937,147 @@ document.addEventListener('DOMContentLoaded', async () => {
   }, { rootMargin: '0px 0px 200px 0px' });
   //? option 'rootMargin' adds a margin to observer so it doesn't wait to exactly come into view of last item
   //* -> will load more item a bit before actually reaching the end (more 'fluid' when scrolling at the end)
-
+  
   stopLoading()
 })
 fetchData()
 
+// todo : can save/load gear sets (by jobs) if logged in
+//! Firebase & login stuff =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+//! Firebase =-=-=-=-=-=-=
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import {  
+  getAuth, 
+  onAuthStateChanged,
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+//- Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDLqmLm2g5FP6ravQIly18wQ7fjHfwfapQ",
+  authDomain: "xiv-builder.firebaseapp.com",
+  projectId: "xiv-builder",
+  storageBucket: "xiv-builder.appspot.com",
+  messagingSenderId: "687875267373",
+  appId: "1:687875267373:web:e069e585d07b8e0caf11a4",
+  measurementId: "G-28XVZRLPKC"
+};
+
+//- Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+console.log(app);
+
+const auth = getAuth(app);
+
+//- Sign up function
+const signUp = (email, password) => {
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      console.log('User signed up:', userCredential.user);
+
+      emptyFormFieldValue()
+      closinFormPopUp()
+      document.getElementById('signup-error').innerText = '';
+    })
+    .catch((error) => {
+      emptyFormFieldValue()
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      
+      //- Display the error message in the DOM
+      const signupErrorElement = document.getElementById('signup-error');
+      if (errorCode === 'auth/email-already-in-use') {
+          signupErrorElement.innerText = 'This Email Is Already In Used';
+      } else {
+          signupErrorElement.innerText = errorMessage;
+      }
+
+      //- Log the error
+      console.error('Error signing up:', error);
+    });
+};
+
+//- Login function
+const login = (email, password) => {
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      console.log('User logged in:', userCredential.user);
+
+      emptyFormFieldValue()
+      closinFormPopUp()
+
+      loginIcon.title = `${email}`
+    })
+    .catch((error) => {
+      emptyFormFieldValue()
+      console.error('Error logging in:', error);
+    });
+};
+
+//- Logout function
+const logout = () => {
+  signOut(auth)
+    .then(() => {
+      console.log('User logged out');
+    })
+    .catch((error) => {
+      console.error('Error logging out:', error);
+    });
+};
+
+//- Function to update loginIcon based on authentication state
+const updateLoginIcon = (user) => {
+  if (user) {
+      // User is signed in
+      loginIcon.style.color = 'green';
+  } else {
+      // No user is signed in
+      loginIcon.style.color = 'rgb(237, 237, 229)';
+  }
+};
+
+//- Authentication state listener
+onAuthStateChanged(auth, (user) => {
+  updateLoginIcon(user);
+});
+
+//! Login
+document.getElementById('login-button').addEventListener('click', e => {
+  const email = document.getElementById('login-field-text').value
+  const password = document.getElementById('login-field-password').value
+
+  if (email != '' && password != ''){
+    console.log('login in...');
+    login(email, password)
+  }
+})
+
+//! Sign Up
+document.getElementById('signup-button').addEventListener('click', e => {
+  const email = document.getElementById('signup-field-text').value
+  const password = document.getElementById('signup-field-password').value
+
+  if ( email != '' && password != ''){
+    console.log('Siging in...');
+    signUp(email, password)
+  }
+})
+
+//! Logout
+document.getElementById('logout').addEventListener('click', e => {
+  logout()
+  updateLoginIcon()
+  alert('You Have Been Logged Out')
+})
 
 //! Style Js (open/closing popups, etc) =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -921,9 +1086,9 @@ function openGearWindow() {
   gearWindow.classList.add('window-pop')
   //* focus() only if job was chosen, cause otherwise if I close window before timeout -> 🐛😅
   if (document.querySelector('.profile-job').firstElementChild.hasAttribute(`data-job`)) {
-    setTimeout(() => {
-      gearSearchBar.focus()
-    }, 2000);
+    // setTimeout(() => {
+    //   gearSearchBar.focus()
+    // }, 2000);
   }
 }
 function closeGearWindow() {
@@ -935,7 +1100,6 @@ function closeGearWindow() {
 
 function openJobSelector() {
   jobSelectorBG.classList.remove('hidden');
-  
 }
 function closeJobSelector() {
   jobSelectorBG.classList.add('hidden');
@@ -949,7 +1113,6 @@ function closeProfileMenu() {
   profileMenu.classList.remove('window-pop')
   profileMenu.classList.add('window-pop-reverse');
 }
-
 
 //! Closing Window When 'Click' Outside Of It
 function outsideClickClose(windowName, closingWingowButton) {
@@ -968,8 +1131,7 @@ function outsideClickClose(windowName, closingWingowButton) {
 
 gearGrid.addEventListener('click', e => {
   const closestGearBox = e.target.closest('.gear-box');
-  if (e.target.classList.contains('gear-box') || 
-  (closestGearBox && closestGearBox.hasAttribute('data-geartype'))) {
+  if (e.target.classList.contains('gear-box') || (closestGearBox && closestGearBox.hasAttribute('data-geartype'))) {
 
     //? Stops event propagation to prevent the document click listener from being immediately triggered
     e.stopPropagation();
@@ -1020,7 +1182,6 @@ function outsideClickCloseProfileMenu() {
 }
 outsideClickCloseProfileMenu()
 
-
 rangelvl.addEventListener('change', () => {
   if (rangelvl.value == 0) {
   document.querySelector('.chosen-lvl').innerHTML = 1
@@ -1035,6 +1196,60 @@ document.querySelector('.fa-circle-question').addEventListener('click', e => {
   document.querySelector('#bubble').classList.toggle('show')
   setTimeout(() => {
     document.querySelector('#bubble').classList.remove('show')
-  }, 1500);
+  }, 1800);
 })
+
+//! Forms 
+
+function openFormLogins() {
+  loginSignin.classList.remove('close')
+  profileWrapper.classList.remove('window-pop-reverse')
+  profileWrapper.classList.add('window-pop')
+}
+function toSignUpForm() {
+  loginSignin.querySelectorAll(`.profile-wrapper`).forEach(elem => elem.classList.remove('close'));
+  document.querySelector('.signup').classList.add('close')
+}
+function toLogInForm() {
+  loginSignin.querySelectorAll(`.profile-wrapper`).forEach(elem => elem.classList.remove('close'));
+  document.querySelector('.login').classList.add('close')
+}
+function emptyFormFieldValue() {
+  document.querySelector('#login-field-text').value = ''
+  document.querySelector('#login-field-password').value = ''
+  document.querySelector('#signup-field-text').value = ''
+  document.querySelector('#signup-field-password').value = ''
+}
+function closinFormPopUp() {
+  if (profileWrapper.classList.contains('window-pop')){
+    profileWrapper.classList.remove('window-pop')
+    profileWrapper.classList.add('window-pop-reverse')
+    emptyFormFieldValue()
+  }
+  profileWrapper.classList.add('window-pop-reverse')
+  profileWrapper.classList.remove('window-pop')
+  loginSignin.classList.add('close')
+}
+
+document.addEventListener('click', function(e) {
+  //* open
+  if (e.target.closest('.login-popup')) {
+    openFormLogins()
+    e.stopPropagation();
+  }
+
+  if(e.target.closest('.login-link')){
+    toSignUpForm()
+    document.getElementById('signup-error').innerText = '';
+  }
+  if (e.target.closest('.signup-link')) {
+    toLogInForm()
+    document.getElementById('signup-error').innerText = '';
+  }
+
+  if (document.querySelector('.blur-bg').contains(e.target)) {
+    closinFormPopUp()
+  }
+});
+
 
