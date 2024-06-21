@@ -43,6 +43,9 @@ const profileWrapper = document.querySelector('.profile-wrapper') // login windo
 const fieldText = document.querySelector('#field-text')
 const fieldPassword = document.querySelector('#field-password')
 const loginIcon = document.getElementById('login-icon')
+const saveLoadbtn = document.querySelector('.save-load') // button opening save/load menu
+const saveLoadMenu = document.querySelector('.save-load-menu') // div containing save/load menu
+const savedJobIconWrapper = document.querySelector('.saved') // wrapper of saved job icons
 
 const gearSearchBar = document.querySelector('#gear-search')
 
@@ -50,6 +53,8 @@ const gearSearchBar = document.querySelector('#gear-search')
 let equippedGear = [];
 let equippedGearIds = [];
 let jobBaseStat = [];
+let savedGearSets = []
+
 
 
 //! other
@@ -64,7 +69,6 @@ let regex = /["\\]/g;
   // todo : job selector popup when clicking on job-stone too
   // todo : add list and store job, id of gear equiped and on which gear type 
   todo : give warning if didn't save, will lose previous 'build' if no -> empty build, if yes -> save + change job
-  todo : add condition to have something equiped on every slot before saving ( list.length === 11 (- shield))
 
   ? save equippedGearIds or equippedGear, need to choose (EquipedIds is more accurate)
 
@@ -92,17 +96,15 @@ let regex = /["\\]/g;
   // todo : Need to get the shortname of job with the number (should do with firstJsonData) 
   // todo : Then take the shortname and search through secondJsonData all the number that contains that shortname (ex : 23 -> DRG; 47 -> lnc, DRG)
   // todo : Return those number and innerHTML in clicked accessory gear all of the gear
-  todo : 🐛 rings only equip on one || doesn't tak stats of second ring ¯\_(ツ)_/¯
+  // todo : 🐛 rings only equip on one || doesn't take stats of second ring ¯\_(ツ)_/¯
   
   ! --> Gear Stats
   // todo : translate numbers to name and asign them to the right stats 
-  todo : Add natural base stats- Add natural base stats
+  // todo : Add natural base stats- Add natural base stats
   * name : BaseParam[0, 1, 2 & 3], stats number : BaseParamValue[0, 1, 2 & 3] 
   * (not 4 & 5, haven't figured out their use yet...)
 
-  ! For Pc Version (last)
-  todo : (idea) quand clique sur case d'equipemment -> lui donne "draggable" et a tout les equipement dans la search window
-  todo : (idea) quand cloque off le search window, enlever toutes les classe draggeable
+
 
   ! Useful Stuff
   // // todo : take as param classJobCategory -> look through numberToName.json if exist as proprety -> then takes its value
@@ -192,7 +194,7 @@ fetch("info.json")
       //- Flatten each category's job array
       return Object.values(category).flat();
     })
-    console.log('jobInfo flatmap : ', allJobs);
+    // console.log('jobInfo flatmap : ', allJobs);
 
     //- Find the job with the matching CSVcode
     const job = allJobs.find(job => job.CSVcode === code);
@@ -276,6 +278,11 @@ function stopLoading() {
   document.getElementById('loading').style.display = 'none';
 }
 
+function emptyGearBox() {
+  gearBoxes.forEach(gearBox => {
+    gearBox.innerHTML = ''
+  });
+}
 
 
 //! Fetch and Main JavaScript =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -285,7 +292,7 @@ async function fetchData() {
 
     const [csvResponse, infoResponse, numberToNameResponse] = await Promise.all([
       fetch('https://raw.githubusercontent.com/xivapi/ffxiv-datamining/master/csv/Item.csv'),
-      fetch('info.json'), // Example URL for second fetch
+      fetch('info.json'),
       fetch('numberToName.json')
     ]);
 
@@ -293,6 +300,7 @@ async function fetchData() {
     const numberToNameData = await numberToNameResponse.json();
 
     const numToNameJson = numberToNameData.numToName[0];
+    //* function to get a list of only truthy keys of an object (param)
     function numberToNameKeys(obj) {
       const result = [];
       for (const key in obj) {
@@ -309,7 +317,6 @@ async function fetchData() {
     const csvFullData = rows.map(row => row.split(','));
     //* Array with only gear that are equipable by class/job on numberToName.json [0]
     const csvData = csvFullData.filter(item => numberToNameKeys(numToNameJson).includes(item[gearVar.jobReq]))
-    // const csvData = csvFullData
 
     return { csvData, infoData, numberToNameData }; // Return an object containing all data
 
@@ -402,6 +409,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     return `${folder_id}/${icon_id}`
   }
 
+
+  //! Base Job Stat Calculation
+  function baseJobStatCalc(code) {
+
+    console.log('infoData list : ', infoData);
+
+    const allJobs = infoData.jobInfo.flatMap(category => {
+      return Object.values(category).flat();
+    })
+
+    console.log('infoData flatmap : ', allJobs);
+
+    //- Find the job with the matching CSVcode
+    const job = allJobs.find(job => job.CSVcode === Number(code));
+    if (job) {
+      jobBaseStat = []
+      //* stats calc from akhmorning.com
+      jobBaseStat.push({
+        strength : ((job.basestr / 100) * 390).toFixed(0),
+        vitality : (job.basevit).toFixed(0),
+        dexterity : ((job.basedex / 100) * 390).toFixed(0),
+        intelligence : ((job.baseint / 100) * 390).toFixed(0),
+        mind : ((job.basemnd / 100) * 390).toFixed(0),
+        skillspeed : ((job.skillspeed ? job.skillspeed : 1) * 400).toFixed(0),
+        spellspeed : ((job.skillspeed ? job.spellspeed : 1) * 400).toFixed(0),
+        tenacity : Number((job.tenacity ? job.tenacity : 1) * 400).toFixed(0),
+        piety: (((job.piety ? job.piety : 1)) * 390).toFixed(0),
+      })
+    } else {
+      return 'Job not found';
+    }
+  }
+
+  baseJobStatCalc("23")
+
   gearGrid.addEventListener('click', e => {
 
     // - The ?. operator ensures that getAttribute is only called if gearBox is not null
@@ -453,7 +495,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.log(`Found ${filteredData.length} Items for '${nbrToNames(String(Job), 0)}' to equip on '${nbrToNames(gearType, 1)}'`);
           loadMoreItems(filteredData);
   
-          //* In case they click on 'off-hand' gear slot (no shields)
+          //* In case we click on 'off-hand' gear slot (no shields)
           if (filteredData.length === 0) {
             searchResults.innerHTML = `
               <div class="item">
@@ -541,9 +583,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           
           const test = csvData.find(job => job[gearVar.itemId] === dataItemId);
           const itemName = test[gearVar.SingItemName].replace(regex, '')
-          
-          // const Job = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
-          // equipGear(Job, dataGearSlot, dataItemId) //! might delete this part as equippedGearIds is better to save + change equipItem to equipGear
 
           closeGearWindow()
     
@@ -575,10 +614,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           } else {
             //* Equiping for all other gear types
             const gearSlot = gearGrid.querySelector(`[data-geartype="${dataGearSlot}"]`);
-            
-            if (gearSlot) {
+
+            if (dataGearSlot === '1') {
+              gearGrid.querySelector(`[data-geartype1="1"]`).innerHTML = `
+                <img class="equipped-item" src="https://xivapi.com/i/${dataIconId}.png" alt="${itemName}" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
+              `
+            } else if (gearSlot) {
               gearSlot.innerHTML = `
-                <img class="equiped-item" src="https://xivapi.com/i/${dataIconId}.png" alt="${itemName}" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
+                <img class="equipped-item" src="https://xivapi.com/i/${dataIconId}.png" alt="${itemName}" data-id="${dataItemId}" title="${itemName} : ${dataItemId}">
               `
             }
           }
@@ -684,27 +727,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
 
-
-  //! "Save" Gear Equiped =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  // function equipGear(job, gearSlot, gearId) {
-
-  //   //* Find the currently equiped job in equippedGear[]
-  //   let jobEntry = equippedGear.find(elem => elem[job]);
-  
-  //   //* If currently equiped job does not exist -> create it
-  //   if (!jobEntry) {
-  //     jobEntry = { [job]: {} };
-  //     equippedGear.push(jobEntry);
-  //   }
-  
-  //   //* Equip gear in the specified slot for the job (or replaces it)
-  //   jobEntry[job][gearSlot] = { gearId };
-  
-  //   console.log(`Equipped ${gearId} in slot ${gearSlot} for job ${job}`);
-  //   console.log('Current equippedGear:', equippedGear);
-  // }
-
-
   //! Full Stats Display =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
   //* Get Equipped Gear IDs
@@ -720,7 +742,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     //* Find the row in the CSV data that match the gear ID
     const gearRow = csvData.find(row => row[0] === gearId);
-    // if (!gearRow) return null;
 
     const gearName = gearRow[10].replace(regex, '')
 
@@ -747,8 +768,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let averageIlvl = 0;
 
     if (equippedGearIds.length > 0) {
-
-      console.log(equippedGearIds);
 
       equippedGearIds.forEach(gearId => {
   
@@ -872,6 +891,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('#magic-def span').innerHTML = othStats.magicDefense ? othStats.magicDefense : 0
     document.getElementById('aIlvl').innerHTML = othStats.averageItemlvl ? othStats.averageItemlvl : 0
 
+    return equippedGearIds
   }
 
   //* To get base stat directly after Job Selection 
@@ -882,26 +902,133 @@ document.addEventListener('DOMContentLoaded', async () => {
   })
 
   //! Saving/Loading =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-  const saveGearSet = (jobId, equippedGearIds) => {
-    // Find if the job already exists in the savedGearSets
-    const existingJob = savedGearSets.find(set => set[jobId]);
 
-    if (existingJob) {
-        // Update the existing job with new equipped gear IDs
-        existingJob[jobId] = equippedGearIds;
-    } else {
-        // Add a new entry for the job
-        savedGearSets.push({ [jobId]: equippedGearIds });
+  //! saving...
+  const saveGearSet = async (jobId, equippedGearIds) => {
+    console.log(jobId, equippedGearIds);
+
+    const userId = auth.currentUser ? auth.currentUser.uid : null;
+    if (!userId) {
+      console.log("No user is signed in.");
+      return;
     }
 
-    console.log('Saved Gear Sets:', savedGearSets);
-};
+    const userRef = ref(database, 'users/' + userId + '/gearSets');
 
+    try {
+      //- Fetch existing gear sets from Firebase
+      const snapshot = await get(userRef);
+      let currentGearSets = snapshot.exists() ? snapshot.val() : {};
+  
+      //- Update or add the new gear set
+      currentGearSets[jobId] = equippedGearIds;
+  
+      //- Save the updated gear sets back to Firebase
+      //- Use the set() method to save the merged gear sets back to Firebase.
+      await set(userRef, currentGearSets);
+  
+      console.log("Gear set saved successfully.");
+    } catch (error) {
+      console.error('Error saving gear set to Firebase:', error);
+    }
+
+  };
+
+  function getSavedJobIcon(jobNbr) {
+    //- Flatten the arrays inside jobInfo
+    const allJobs = infoData.jobInfo.flatMap(category => {
+      //- Flatten each category's job array
+      return Object.values(category).flat();
+    })
+
+    const findJob = allJobs.find(job => job.CSVcode === Number(jobNbr));
+    if (findJob) {
+      // console.log('Job name is : ' + findJob.shortname);
+      return {
+        icon : findJob.jobicon,
+        fullname : findJob.fullname,
+        shortname : findJob.shortname,
+        CSVcode : findJob.CSVcode,
+        baseHp : findJob.basehp,
+        jobstone : findJob.jobstone,
+
+      }
+    } else {
+      return 'NaN'
+    }
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!saveLoadMenu.contains(e.target) && e.target !== burgerX && saveLoadMenu.classList.contains('window-pop')) {
+      closeProfileMenu(saveLoadMenu)
+      saveLoadbtn.classList.remove('close-save-load')
+    }
+
+    const userId = auth.currentUser ? auth.currentUser.uid : null;
+    
+    const loadUserData = (userId) => {
+      console.log('in load User Data');
+      
+      const userRef = ref(database, 'users/' + userId + '/gearSets');
+      get(child(userRef, '/')).then((snapshot) => {
+        if (snapshot.exists()) {
+          const userData = snapshot.val();
+          displayJobIcons(userData);
+        }
+      }).catch((error) => {
+        console.error('Error fetching user data:', error);
+      });
+    };
+    
+    // Function to display job icons
+    const displayJobIcons = (gearSets) => {
+      savedJobIconWrapper.innerHTML = ''; //* Clear any existing icons
+
+      Object.keys(gearSets).forEach(jobId => {
+        savedJobIconWrapper.innerHTML += `
+          <div class="job-icon" data-code="${getSavedJobIcon(jobId).CSVcode}" title="${getSavedJobIcon(jobId).fullname}">
+            <img src="${getSavedJobIcon(jobId).icon}" alt="final fantasy xiv's ${getSavedJobIcon(jobId).fullname} job icon">
+          </div>
+        `
+      });
+    };
+    
+    if (document.querySelector('.fa-floppy-disk').contains(e.target)) {
+    // if (e.target.closest('.save-load')) {
+      //! SAVING FUNCTION HERE
+      const jobId = document.querySelector('.profile-job').firstElementChild.getAttribute(`data-job`)
+
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          
+          console.log(`Saving Build For '${findJobShortname(Number(jobId))} (${jobId})'`);
+          saveGearSet(jobId, onGearEquipped())
+      
+        } else {
+            console.log("No user is signed in.");
+        }
+      });
+
+      closeProfileMenu(saveLoadMenu)
+      saveLoadbtn.classList.remove('close-save-load')
+    }
+
+    if (document.querySelector('.fa-arrows-rotate').contains(e.target)) {
+      //! LOADING FUNCTION HERE
+      loadUserData(userId)
+
+      if (document.querySelector('.job-icon').contains(e.target)) {
+        closeProfileMenu(saveLoadMenu)
+        saveLoadbtn.classList.remove('close-save-load')
+      }
+    }
+
+  });
 
 
   //! On Job Change 
   function onJobChange() {
-    // too lazy for now 
+    //* too lazy for now 
     //-> if changes Job 
     //  -> offer to save current set (window with warning 'gear will del, do you want to save ? y/n)
     //    -> if (yes) 
@@ -937,7 +1064,131 @@ document.addEventListener('DOMContentLoaded', async () => {
   }, { rootMargin: '0px 0px 200px 0px' });
   //? option 'rootMargin' adds a margin to observer so it doesn't wait to exactly come into view of last item
   //* -> will load more item a bit before actually reaching the end (more 'fluid' when scrolling at the end)
+
+  savedJobIconWrapper.addEventListener('click', async  (e) => {
+    if (e.target.closest('.job-icon').hasAttribute('data-code')) {
+      
+      // todo : get the jobCode
+      const jobCode = e.target.closest('.job-icon').getAttribute('data-code')
+      console.log(`job code : ${jobCode}`);
+      
+      // todo : get the saved data from firebase
+      const userId = auth.currentUser ? auth.currentUser.uid : null;
+      if (!userId) {
+        console.log("No user is signed in.");
+        return;
+      }
+      
+      const userRef = ref(database, 'users/' + userId + '/gearSets');
+      let savedGearSets = {};
+
+      try {
+        const snapshot = await get(userRef);
+        if (snapshot.exists()) {
+          savedGearSets = snapshot.val();
+          console.log('Saved Gear Sets:', savedGearSets);
+        } else {
+          console.log('No gear sets found for user.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error loading gear sets from Firebase:', error);
+        return;
+      }
+
+      // todo : fill profile-job & job-stone with right job icon and data
+      const gearInfoJson = getSavedJobIcon(jobCode)
+      
+      document.querySelector('.job-stone').innerHTML = `
+        <img src="${gearInfoJson.jobstone}" alt="${gearInfoJson.fullname}'s job stone icon">
+        <span>${gearInfoJson.shortname}</span>
+      `
+      //* profile job icon
+      document.querySelector('.profile-job').innerHTML = `
+        <div class="job-change gear-box" style="background: url(${gearInfoJson.icon}) center/cover" data-job="${gearInfoJson.CSVcode}" data-hp="${gearInfoJson.baseHp}" data-effect="gear-box--anim">
+        </div>
+      `
+
+      // todo : get the object in saved data that matches Number(jobCode)
+      const gearIdsForJob = savedGearSets[jobCode];
+      console.log(`gear Ids for ${findJobShortname(Number(jobCode))} (${jobCode}) : ${gearIdsForJob}`);
+      if (!gearIdsForJob) {
+        console.log(`No saved gear for job: ${findJobShortname(Number(jobCode))} (${jobCode})`);
+        return;
+      }
+
+      // todo : empty all gear slots
+      emptyGearBox()
+
+      // todo : for each Id's in that list
+      gearIdsForJob.forEach(gearId  => {
+
+        // todo : get from cvsData the geartype & iconNbr of each one of those gear Id
+        const gearRow = csvData.find(row => row[0] === gearId);
+        if (!gearRow) {
+          console.log(`No data found for gear ID: ${gearId}`);
+          return;
+        }
+
+        const gearTypeData = gearRow[gearVar.equipSlot];
+        const gearIconData = gearRow[gearVar.icons];
+        const gearNameData = gearRow[gearVar.SingItemName].replace(regex, '');
   
+        // todo : get icon with iconFunction(iconNbr), funciton will return rest of icon image
+        const iconUrl = iconFunction(gearIconData);
+  
+        // todo : innerHTML those gear icon like when equiping gear (with data etc)
+        // const gearSlot = gearGrid.querySelector(`[data-geartype="${gearTypeData}"]`);
+        let gearSlot;
+
+        // * Check if the gear type is '12' for rings
+        if (gearTypeData === '12') {
+          console.log('In Ring conditions');
+          const firstRingSlot = gearGrid.querySelector(`[data-geartype="12"]`);
+          const secondRingSlot = gearGrid.querySelector(`[data-geartype="12"]:last-of-type`);
+
+          if (firstRingSlot && firstRingSlot.innerHTML.trim() === '') {
+            console.log('equiping ring #1');
+            gearSlot = firstRingSlot;
+          } else if (secondRingSlot) {
+            console.log('equiping ring #2');
+            gearSlot = secondRingSlot;
+          } else {
+            console.log('Both ring slots are occupied.');
+            return;
+          }
+        } else {
+          //* For other gear types
+          gearSlot = gearGrid.querySelector(`[data-geartype="${gearTypeData}"]`);
+        }
+      
+
+
+        if (gearTypeData === '1') {
+          gearGrid.querySelector(`[data-geartype1="1"]`).innerHTML = `
+            <img class="equipped-item" src="https://xivapi.com/i/${iconUrl}.png" alt="${gearNameData}" data-id="${gearId}" title="${gearNameData} : ${gearId}">
+          `
+        } else if (gearSlot) {
+          gearSlot.innerHTML = `
+            <img class="equipped-item" src="https://xivapi.com/i/${iconUrl}.png" alt="icon of ${gearNameData}" data-id="${gearId}" title="${gearNameData} : ${gearId}">
+          `;
+        } else{
+          console.log(`no item equiped for ${gearSlot}`);
+        }
+        
+      });
+      // todo : push base stat of job
+      baseJobStatCalc(jobCode)
+
+      // todo : then onGearEquipped(), function that will calculate stats
+      onGearEquipped(Number())
+
+      saveLoadbtn.classList.remove('close-save-load')
+      saveLoadMenu.classList.remove('window-pop')
+      saveLoadMenu.classList.add('window-pop-reverse');
+    }
+  })
+
   stopLoading()
 })
 fetchData()
@@ -948,11 +1199,12 @@ fetchData()
 //! Firebase =-=-=-=-=-=-=
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import {  
   getAuth, 
-  onAuthStateChanged,
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword, 
+  onAuthStateChanged,
   signOut 
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
@@ -964,6 +1216,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDLqmLm2g5FP6ravQIly18wQ7fjHfwfapQ",
   authDomain: "xiv-builder.firebaseapp.com",
   projectId: "xiv-builder",
+  databaseURL : "https://xiv-builder-default-rtdb.europe-west1.firebasedatabase.app/",
   storageBucket: "xiv-builder.appspot.com",
   messagingSenderId: "687875267373",
   appId: "1:687875267373:web:e069e585d07b8e0caf11a4",
@@ -973,84 +1226,121 @@ const firebaseConfig = {
 //- Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const auth = getAuth(app);
+//- Initialize Firebase Database
+const database = getDatabase();
 
 console.log(app);
 
-const auth = getAuth(app);
 
 //- Sign up function
 const signUp = (email, password) => {
   createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log('User signed up:', userCredential.user);
+  .then((userCredential) => {
+    console.log('User signed up:', userCredential.user);
 
-      emptyFormFieldValue()
-      closinFormPopUp()
-      document.getElementById('signup-error').innerText = '';
-    })
-    .catch((error) => {
-      emptyFormFieldValue()
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      
-      //- Display the error message in the DOM
-      const signupErrorElement = document.getElementById('signup-error');
-      if (errorCode === 'auth/email-already-in-use') {
-          signupErrorElement.innerText = 'This Email Is Already In Used';
-      } else {
-          signupErrorElement.innerText = errorMessage;
-      }
+    emptyFormFieldValue()
+    closinFormPopUp()
+    document.getElementById('signup-error').innerText = '';
+  })
+  .catch((error) => {
+    emptyFormFieldValue()
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    
+    //- Display the error message in the DOM
+    const signupErrorElement = document.getElementById('signup-error');
+    if (errorCode === 'auth/email-already-in-use') {
+        signupErrorElement.innerText = 'This Email Is Already In Used';
+    } else {
+        signupErrorElement.innerText = errorMessage;
+    }
 
-      //- Log the error
-      console.error('Error signing up:', error);
-    });
+    //- Log the error
+    console.error('Error signing up:', error);
+  });
 };
 
 //- Login function
 const login = (email, password) => {
   signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      console.log('User logged in:', userCredential.user);
+  .then((userCredential) => {
+    console.log('User logged in:', userCredential.user);
 
-      emptyFormFieldValue()
-      closinFormPopUp()
+    emptyFormFieldValue()
+    closinFormPopUp()
 
-      loginIcon.title = `${email}`
-    })
-    .catch((error) => {
-      emptyFormFieldValue()
-      console.error('Error logging in:', error);
-    });
+    loginIcon.title = `${email}`
+  })
+  .catch((error) => {
+    emptyFormFieldValue()
+    console.error('Error logging in:', error);
+  });
 };
 
 //- Logout function
 const logout = () => {
   signOut(auth)
-    .then(() => {
-      console.log('User logged out');
-    })
-    .catch((error) => {
-      console.error('Error logging out:', error);
-    });
+  .then(() => {
+    console.log('User logged out');
+    emptyGearBox()
+  })
+  .catch((error) => {
+    console.error('Error logging out:', error);
+  });
 };
 
 //- Function to update loginIcon based on authentication state
 const updateLoginIcon = (user) => {
   if (user) {
-      // User is signed in
-      loginIcon.style.color = 'green';
+    // User is signed in
+    loginIcon.style.color = 'green';
   } else {
-      // No user is signed in
-      loginIcon.style.color = 'rgb(237, 237, 229)';
+    // No user is signed in
+    loginIcon.style.color = 'rgb(237, 237, 229)';
   }
 };
 
 //- Authentication state listener
 onAuthStateChanged(auth, (user) => {
-  updateLoginIcon(user);
+  if (user) {
+    const userId = user.uid;
+    console.log("User is signed in with UID:", userId);
+    // document.querySelector('name').innerText = user.email
+
+
+    updateLoginIcon(user);
+    // loadUserData(userId);
+  } else {
+    console.log("No user is signed in.");
+  }
 });
 
-//! Login
+//- Function to save gear sets in Firebase
+const saveGearSetsToFirebase = (userId, savedGearSets) => {
+  if (!userId) {
+    console.error("No user ID provided. Cannot save gear sets.");
+    return;
+  }
+
+  // Check for undefined values in savedGearSets
+  const hasUndefined = Object.values(savedGearSets).some(value => value === undefined);
+  if (hasUndefined) {
+    console.error("Cannot save gear sets with undefined values:", savedGearSets);
+    return;
+  }
+
+  set(ref(database, 'users/' + userId + '/gearSets'), savedGearSets)
+  .then(() => {
+      console.log('Gear sets saved to Firebase.');
+  })
+  .catch((error) => {
+      console.error('Error saving gear sets to Firebase:', error);
+  });
+};
+
+
+//! Login =-=-=-=-=-=-=-=
 document.getElementById('login-button').addEventListener('click', e => {
   const email = document.getElementById('login-field-text').value
   const password = document.getElementById('login-field-password').value
@@ -1061,7 +1351,7 @@ document.getElementById('login-button').addEventListener('click', e => {
   }
 })
 
-//! Sign Up
+//! Sign Up =-=-=-=-=-=-=-=
 document.getElementById('signup-button').addEventListener('click', e => {
   const email = document.getElementById('signup-field-text').value
   const password = document.getElementById('signup-field-password').value
@@ -1072,7 +1362,7 @@ document.getElementById('signup-button').addEventListener('click', e => {
   }
 })
 
-//! Logout
+//! Logout =-=-=-=-=-=-=-=
 document.getElementById('logout').addEventListener('click', e => {
   logout()
   updateLoginIcon()
@@ -1105,13 +1395,13 @@ function closeJobSelector() {
   jobSelectorBG.classList.add('hidden');
 }
 
-function openProfileMenu() {
-  profileMenu.classList.remove('window-pop-reverse');
-  profileMenu.classList.add('window-pop')
+function openProfileMenu(elem) {
+  elem.classList.remove('window-pop-reverse');
+  elem.classList.add('window-pop')
 }
-function closeProfileMenu() {
-  profileMenu.classList.remove('window-pop')
-  profileMenu.classList.add('window-pop-reverse');
+function closeProfileMenu(elem) {
+  elem.classList.remove('window-pop')
+  elem.classList.add('window-pop-reverse');
 }
 
 //! Closing Window When 'Click' Outside Of It
@@ -1161,21 +1451,22 @@ document.querySelector('.job-save').addEventListener('click', e => {
 outsideClickClose(jobSelectorBG, jobSelectorX)
 jobSelectorX.addEventListener('click', closeJobSelector)
 
+//! opening filter options menu =-=-=-=-=-=-=-=
 burgerX.addEventListener('click', (e) => {
   // burgerX.classList.toggle('.close-burger')
   if (!e.target.closest('.close-burger')) {
     burgerX.classList.add('close-burger')
     e.stopPropagation();
-    openProfileMenu()
+    openProfileMenu(profileMenu)
   } else if (e.target.closest('.close-burger')) {
     burgerX.classList.remove('close-burger')
-    closeProfileMenu()
+    closeProfileMenu(profileMenu)
   }
 })
 function outsideClickCloseProfileMenu() {
   document.addEventListener('click', function(e) {
     if (!profileMenu.contains(e.target) && e.target !== burgerX && profileMenu.classList.contains('window-pop')) {
-      closeProfileMenu()
+      closeProfileMenu(profileMenu)
       burgerX.classList.remove('close-burger')
     }
   });
@@ -1192,6 +1483,21 @@ rangelvl.addEventListener('change', () => {
 console.log('min lvl gear : ', rangelvl.value);
 
 
+//! opening saved/load builds menu =-=-=-=-=-=-=-=
+
+saveLoadbtn.addEventListener('click', (e) => {
+  // burgerX.classList.toggle('.close-burger')
+  if (!e.target.closest('.close-save-load')) {
+    saveLoadbtn.classList.add('close-save-load')
+    e.stopPropagation();
+    openProfileMenu(saveLoadMenu)
+  } else if (e.target.closest('.close-save-loadr')) {
+    saveLoadbtn.classList.remove('close-save-load')
+    closeProfileMenu(saveLoadMenu)
+  }
+})
+
+//! bubble stats info =-=-=-=-=-=-=-=-
 document.querySelector('.fa-circle-question').addEventListener('click', e => {
   document.querySelector('#bubble').classList.toggle('show')
   setTimeout(() => {
@@ -1199,7 +1505,7 @@ document.querySelector('.fa-circle-question').addEventListener('click', e => {
   }, 1800);
 })
 
-//! Forms 
+//! Forms =-=-=-=-=-=-=-=-=
 
 function openFormLogins() {
   loginSignin.classList.remove('close')
@@ -1251,5 +1557,3 @@ document.addEventListener('click', function(e) {
     closinFormPopUp()
   }
 });
-
-
