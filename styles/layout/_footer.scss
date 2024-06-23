@@ -11,14 +11,21 @@ footer{
   
   > div{
     background-color: #242024;
-    
+    // width: 400px;
+    a{
+      color: blueviolet;
+    }
     em{
+      width: 400px;
       color: rgb(202, 202, 202);
       font-size: .7rem;
 
-      a{
-        color: blueviolet;
-      }
+    }
+    p{
+      width: 400px;
+      margin: 0 auto;
+      color: rgb(202, 202, 202);
+      font-size: .75rem;
     }
 
   }

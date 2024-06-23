@@ -444,8 +444,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  baseJobStatCalc("23")
-
   gearGrid.addEventListener('click', e => {
 
     // - The ?. operator ensures that getAttribute is only called if gearBox is not null
@@ -853,11 +851,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     //--> lvl90 HP = ( lvlMod,HP * (jobMod,HP / 100 ) ) + ( (Vitality - lvlMod,Main ) * jobFinalMulti )
     console.log(`base Hp : ${baseHp}, total Vit : ${totalStats.vitality}, final Multi : ${jobFinalMulti}`);
     const HP = parseInt(3000 * ( baseHp / 100 )) + (( totalStats.vitality - 390) * jobFinalMulti )
+    const absoluteHP = Math.abs(HP)
 
     document.querySelector('.HP').innerHTML = `
       <div>
         <div>HP</div>
-        <div>${HP}</div>
+        <div>${absoluteHP}</div>
       </div>
       <div class="bar"></div>
     `
