@@ -973,7 +973,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveLoadbtn.classList.remove('close-save-load')
         closeProfileMenu(saveLoadMenu)
       }
-
     })
     
     console.log('click');
