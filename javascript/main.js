@@ -182,7 +182,7 @@ fetch("info.json")
       <div class="job-name">${data.jobInfo[4].mages[i].fullname}</div>
     </div>
     `
-  } 
+  }
 
   //! Job Selector =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
@@ -261,6 +261,9 @@ fetch("info.json")
         <img src="${jobInfo.jobstone}" alt="">
         <span data-jobname="${jobInfo.fullname}">${jobInfo.shortname}</span>
       `
+
+      document.querySelector('.job-name').innerHTML = jobInfo.fullname
+      document.querySelector('.job-name').classList.add('job-choosed')
 
     }
 
@@ -412,8 +415,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   //! Base Job Stat Calculation
   function baseJobStatCalc(code) {
-
-    console.log('infoData list : ', infoData);
+    // console.log('infoData list : ', infoData);
 
     const allJobs = infoData.jobInfo.flatMap(category => {
       return Object.values(category).flat();
@@ -958,7 +960,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  document.addEventListener('click', function(e) {
+  document.querySelector('.profile').addEventListener('click', (e) => {
+
+    //! opening saved/load builds menu =-=-=-=-=-=-=-=
+
+    saveLoadbtn.addEventListener('click', (e) => {
+      if (!e.target.closest('.close-save-load')) {
+        saveLoadbtn.classList.add('close-save-load')
+        e.stopPropagation();
+        openProfileMenu(saveLoadMenu)
+      } else if (e.target.closest('.close-save-loadr')) {
+        saveLoadbtn.classList.remove('close-save-load')
+        closeProfileMenu(saveLoadMenu)
+      }
+
+    })
+    
+    console.log('click');
+
     if (!saveLoadMenu.contains(e.target) && e.target !== burgerX && saveLoadMenu.classList.contains('window-pop')) {
       closeProfileMenu(saveLoadMenu)
       saveLoadbtn.classList.remove('close-save-load')
@@ -968,16 +987,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const loadUserData = (userId) => {
       console.log('in load User Data');
-      
-      const userRef = ref(database, 'users/' + userId + '/gearSets');
-      get(child(userRef, '/')).then((snapshot) => {
-        if (snapshot.exists()) {
-          const userData = snapshot.val();
-          displayJobIcons(userData);
-        }
-      }).catch((error) => {
-        console.error('Error fetching user data:', error);
-      });
+      if (userId) {
+        const userRef = ref(database, 'users/' + userId + '/gearSets');
+        get(child(userRef, '/')).then((snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            displayJobIcons(userData);
+          }})
+        .catch((error) => {
+          console.error('Error fetching user data:', error);
+        })
+      } else{
+        console.log('you must be logged in or signup in order to be able to save/load your builds');
+      }
     };
     
     // Function to display job icons
@@ -1066,13 +1088,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   //* -> will load more item a bit before actually reaching the end (more 'fluid' when scrolling at the end)
 
   savedJobIconWrapper.addEventListener('click', async  (e) => {
+
     if (e.target.closest('.job-icon').hasAttribute('data-code')) {
       
-      // todo : get the jobCode
+      // // todo : get the jobCode
       const jobCode = e.target.closest('.job-icon').getAttribute('data-code')
       console.log(`job code : ${jobCode}`);
       
-      // todo : get the saved data from firebase
+      // // todo : get the saved data from firebase
       const userId = auth.currentUser ? auth.currentUser.uid : null;
       if (!userId) {
         console.log("No user is signed in.");
@@ -1096,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // todo : fill profile-job & job-stone with right job icon and data
+      // todo : fill profile & job-stone with right job icon and info
       const gearInfoJson = getSavedJobIcon(jobCode)
       
       document.querySelector('.job-stone').innerHTML = `
@@ -1108,8 +1131,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="job-change gear-box" style="background: url(${gearInfoJson.icon}) center/cover" data-job="${gearInfoJson.CSVcode}" data-hp="${gearInfoJson.baseHp}" data-effect="gear-box--anim">
         </div>
       `
+      document.querySelector('.job-name').innerHTML = gearInfoJson.fullname
+      document.querySelector('.job-name').classList.add('job-choosed')
 
-      // todo : get the object in saved data that matches Number(jobCode)
+      // // todo : get the object in saved data that matches Number(jobCode)
       const gearIdsForJob = savedGearSets[jobCode];
       console.log(`gear Ids for ${findJobShortname(Number(jobCode))} (${jobCode}) : ${gearIdsForJob}`);
       if (!gearIdsForJob) {
@@ -1117,13 +1142,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // todo : empty all gear slots
+      // // todo : empty all gear slots
       emptyGearBox()
 
-      // todo : for each Id's in that list
+      // // todo : for each Id's in that list
       gearIdsForJob.forEach(gearId  => {
 
-        // todo : get from cvsData the geartype & iconNbr of each one of those gear Id
+        // // todo : get from cvsData the geartype & iconNbr of each one of those gear Id
         const gearRow = csvData.find(row => row[0] === gearId);
         if (!gearRow) {
           console.log(`No data found for gear ID: ${gearId}`);
@@ -1134,10 +1159,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const gearIconData = gearRow[gearVar.icons];
         const gearNameData = gearRow[gearVar.SingItemName].replace(regex, '');
   
-        // todo : get icon with iconFunction(iconNbr), funciton will return rest of icon image
+       //  // todo : get icon with iconFunction(iconNbr), funciton will return rest of icon image
         const iconUrl = iconFunction(gearIconData);
   
-        // todo : innerHTML those gear icon like when equiping gear (with data etc)
+        // // todo : innerHTML those gear icon like when equiping gear (with data etc)
         // const gearSlot = gearGrid.querySelector(`[data-geartype="${gearTypeData}"]`);
         let gearSlot;
 
@@ -1177,11 +1202,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
       });
-      // todo : push base stat of job
+      // // todo : push base stat of job
       baseJobStatCalc(jobCode)
 
-      // todo : then onGearEquipped(), function that will calculate stats
-      onGearEquipped(Number())
+      // // todo : then onGearEquipped(), function that will calculate stats
+      onGearEquipped()
 
       saveLoadbtn.classList.remove('close-save-load')
       saveLoadMenu.classList.remove('window-pop')
@@ -1295,6 +1320,7 @@ const updateLoginIcon = (user) => {
   if (user) {
     // User is signed in
     loginIcon.style.color = 'green';
+    document.querySelector('.name').innerText = user.email
   } else {
     // No user is signed in
     loginIcon.style.color = 'rgb(237, 237, 229)';
@@ -1312,7 +1338,7 @@ onAuthStateChanged(auth, (user) => {
     updateLoginIcon(user);
     // loadUserData(userId);
   } else {
-    console.log("No user is signed in.");
+    console.log("No user logged in in.");
   }
 });
 
@@ -1483,19 +1509,7 @@ rangelvl.addEventListener('change', () => {
 console.log('min lvl gear : ', rangelvl.value);
 
 
-//! opening saved/load builds menu =-=-=-=-=-=-=-=
 
-saveLoadbtn.addEventListener('click', (e) => {
-  // burgerX.classList.toggle('.close-burger')
-  if (!e.target.closest('.close-save-load')) {
-    saveLoadbtn.classList.add('close-save-load')
-    e.stopPropagation();
-    openProfileMenu(saveLoadMenu)
-  } else if (e.target.closest('.close-save-loadr')) {
-    saveLoadbtn.classList.remove('close-save-load')
-    closeProfileMenu(saveLoadMenu)
-  }
-})
 
 //! bubble stats info =-=-=-=-=-=-=-=-
 document.querySelector('.fa-circle-question').addEventListener('click', e => {
