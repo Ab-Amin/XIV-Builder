@@ -321,6 +321,8 @@ async function fetchData() {
     //* Array with only gear that are equipable by class/job on numberToName.json [0]
     const csvData = csvFullData.filter(item => numberToNameKeys(numToNameJson).includes(item[gearVar.jobReq]))
 
+    console.log(csvFullData);
+
     return { csvData, infoData, numberToNameData }; // Return an object containing all data
 
     } catch (error) {
@@ -1023,7 +1025,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           
           console.log(`Saving Build For '${findJobShortname(Number(jobId))} (${jobId})'`);
           saveGearSet(jobId, onGearEquipped())
-      
+          
+          setTimeout(() => {
+            loadUserData(userId)
+          }, 1000);
+
         } else {
             console.log("No user is signed in.");
         }
